@@ -1,0 +1,85 @@
+{
+  "documents": [
+    {
+      "sourceFile": "PRD-004-F001-拍照识别功能设计.md",
+      "baseName": "PRD-004-F001-拍照识别功能设计",
+      "title": "PRD-004 产品 · 拍照识别功能设计",
+      "system": "钉钉AI表格应用",
+      "project": "AI市调助手与智能定价系统",
+      "docCode": "PRD-004-F001",
+      "version": "v0.1"
+    },
+    {
+      "sourceFile": "PRD-004-F002-数据结构化存储功能设计.md",
+      "baseName": "PRD-004-F002-数据结构化存储功能设计",
+      "title": "PRD-004 产品 · 数据结构化存储功能设计",
+      "system": "钉钉AI表格应用",
+      "project": "AI市调助手与智能定价系统",
+      "docCode": "PRD-004-F002",
+      "version": "v0.1"
+    },
+    {
+      "sourceFile": "PRD-004-F003-竞品价格趋势功能设计.md",
+      "baseName": "PRD-004-F003-竞品价格趋势功能设计",
+      "title": "PRD-004 产品 · 竞品价格趋势功能设计",
+      "system": "钉钉AI表格应用",
+      "project": "AI市调助手与智能定价系统",
+      "docCode": "PRD-004-F003",
+      "version": "v0.1"
+    },
+    {
+      "sourceFile": "PRD-004-F004-比价报告功能设计.md",
+      "baseName": "PRD-004-F004-比价报告功能设计",
+      "title": "PRD-004 产品 · 比价报告功能设计",
+      "system": "钉钉AI表格应用",
+      "project": "AI市调助手与智能定价系统",
+      "docCode": "PRD-004-F004",
+      "version": "v0.1"
+    },
+    {
+      "sourceFile": "PRD-004-F005-智能定价建议功能设计.md",
+      "baseName": "PRD-004-F005-智能定价建议功能设计",
+      "title": "PRD-004 产品 · 智能定价建议功能设计",
+      "system": "钉钉AI表格应用",
+      "project": "AI市调助手与智能定价系统",
+      "docCode": "PRD-004-F005",
+      "version": "v0.1"
+    },
+    {
+      "sourceFile": "PRD-004-F006-价格弹性分析功能设计.md",
+      "baseName": "PRD-004-F006-价格弹性分析功能设计",
+      "title": "PRD-004 产品 · 价格弹性分析功能设计",
+      "system": "钉钉AI表格应用",
+      "project": "AI市调助手与智能定价系统",
+      "docCode": "PRD-004-F006",
+      "version": "v0.1"
+    },
+    {
+      "sourceFile": "PRD-004-F007-异常价格告警功能设计.md",
+      "baseName": "PRD-004-F007-异常价格告警功能设计",
+      "title": "PRD-004 产品 · 异常价格告警功能设计",
+      "system": "钉钉AI表格应用",
+      "project": "AI市调助手与智能定价系统",
+      "docCode": "PRD-004-F007",
+      "version": "v0.1"
+    },
+    {
+      "sourceFile": "PRD-004-F009-定价规则管理功能设计.md",
+      "baseName": "PRD-004-F009-定价规则管理功能设计",
+      "title": "PRD-004 产品 · 定价规则管理功能设计",
+      "system": "钉钉AI表格应用",
+      "project": "AI市调助手与智能定价系统",
+      "docCode": "PRD-004-F009",
+      "version": "v0.1"
+    },
+    {
+      "sourceFile": "PRD-004-F010-价格审批流程功能设计.md",
+      "baseName": "PRD-004-F010-价格审批流程功能设计",
+      "title": "PRD-004 产品 · 价格审批流程功能设计",
+      "system": "钉钉AI表格应用",
+      "project": "AI市调助手与智能定价系统",
+      "docCode": "PRD-004-F010",
+      "version": "v0.1"
+    }
+  ]
+}
