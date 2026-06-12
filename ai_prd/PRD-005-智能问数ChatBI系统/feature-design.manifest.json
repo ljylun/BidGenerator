@@ -1,0 +1,40 @@
+{
+  "documents": [
+    {
+      "source": "h:\\DEV\\MyProjects\\BidGenerator\\ai_prd\\PRD-005-智能问数ChatBI系统\\ChatBI-自然语言提问功能设计.md",
+      "baseName": "ChatBI-自然语言提问功能设计"
+    },
+    {
+      "source": "h:\\DEV\\MyProjects\\BidGenerator\\ai_prd\\PRD-005-智能问数ChatBI系统\\ChatBI-NL2SQL转换功能设计.md",
+      "baseName": "ChatBI-NL2SQL转换功能设计"
+    },
+    {
+      "source": "h:\\DEV\\MyProjects\\BidGenerator\\ai_prd\\PRD-005-智能问数ChatBI系统\\ChatBI-查询执行功能设计.md",
+      "baseName": "ChatBI-查询执行功能设计"
+    },
+    {
+      "source": "h:\\DEV\\MyProjects\\BidGenerator\\ai_prd\\PRD-005-智能问数ChatBI系统\\ChatBI-可视化展示功能设计.md",
+      "baseName": "ChatBI-可视化展示功能设计"
+    },
+    {
+      "source": "h:\\DEV\\MyProjects\\BidGenerator\\ai_prd\\PRD-005-智能问数ChatBI系统\\ChatBI-数据权限控制功能设计.md",
+      "baseName": "ChatBI-数据权限控制功能设计"
+    },
+    {
+      "source": "h:\\DEV\\MyProjects\\BidGenerator\\ai_prd\\PRD-005-智能问数ChatBI系统\\ChatBI-热门问题推荐功能设计.md",
+      "baseName": "ChatBI-热门问题推荐功能设计"
+    },
+    {
+      "source": "h:\\DEV\\MyProjects\\BidGenerator\\ai_prd\\PRD-005-智能问数ChatBI系统\\ChatBI-查询历史功能设计.md",
+      "baseName": "ChatBI-查询历史功能设计"
+    },
+    {
+      "source": "h:\\DEV\\MyProjects\\BidGenerator\\ai_prd\\PRD-005-智能问数ChatBI系统\\ChatBI-结果导出功能设计.md",
+      "baseName": "ChatBI-结果导出功能设计"
+    },
+    {
+      "source": "h:\\DEV\\MyProjects\\BidGenerator\\ai_prd\\PRD-005-智能问数ChatBI系统\\ChatBI-指标字典管理功能设计.md",
+      "baseName": "ChatBI-指标字典管理功能设计"
+    }
+  ]
+}
