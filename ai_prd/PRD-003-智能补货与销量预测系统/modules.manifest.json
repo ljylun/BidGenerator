@@ -1,0 +1,46 @@
+{
+  "documents": [
+    {
+      "source": "g:\\Projects\\BidGenerator\\ai_prd\\modules\\M1-销量预测模块.md",
+      "baseName": "M1-销量预测模块",
+      "documentTitle": "销量预测模块功能设计",
+      "moduleName": "销量预测"
+    },
+    {
+      "source": "g:\\Projects\\BidGenerator\\ai_prd\\modules\\M2-订货建议模块.md",
+      "baseName": "M2-订货建议模块",
+      "documentTitle": "订货建议模块功能设计",
+      "moduleName": "订货建议"
+    },
+    {
+      "source": "g:\\Projects\\BidGenerator\\ai_prd\\modules\\M3-动态损耗计算模块.md",
+      "baseName": "M3-动态损耗计算模块",
+      "documentTitle": "动态损耗计算模块功能设计",
+      "moduleName": "动态损耗计算"
+    },
+    {
+      "source": "g:\\Projects\\BidGenerator\\ai_prd\\modules\\M4-库存校准与毛利核算模块.md",
+      "baseName": "M4-库存校准与毛利核算模块",
+      "documentTitle": "库存校准与毛利核算模块功能设计",
+      "moduleName": "库存校准与毛利核算"
+    },
+    {
+      "source": "g:\\Projects\\BidGenerator\\ai_prd\\modules\\M5-监控与预警模块.md",
+      "baseName": "M5-监控与预警模块",
+      "documentTitle": "监控与预警模块功能设计",
+      "moduleName": "监控与预警"
+    },
+    {
+      "source": "g:\\Projects\\BidGenerator\\ai_prd\\modules\\M6-多维分析看板模块.md",
+      "baseName": "M6-多维分析看板模块",
+      "documentTitle": "多维分析看板模块功能设计",
+      "moduleName": "多维分析看板"
+    },
+    {
+      "source": "g:\\Projects\\BidGenerator\\ai_prd\\modules\\M7-数据管理模块.md",
+      "baseName": "M7-数据管理模块",
+      "documentTitle": "数据管理模块功能设计",
+      "moduleName": "数据管理"
+    }
+  ]
+}

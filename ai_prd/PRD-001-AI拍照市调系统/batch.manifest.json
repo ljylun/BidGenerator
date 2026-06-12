@@ -1,0 +1,34 @@
+{
+  "documents": [
+    {
+      "source": "g:\\Projects\\BidGenerator\\ai_prd\\AI拍照市调系统-拍照采集与智能识别功能设计.md",
+      "outputDir": "g:\\Projects\\BidGenerator\\ai_prd",
+      "basename": "AI拍照市调系统-拍照采集与智能识别功能设计",
+      "title": "AI拍照市调系统 · 拍照采集与智能识别功能设计"
+    },
+    {
+      "source": "g:\\Projects\\BidGenerator\\ai_prd\\AI拍照市调系统-人工复核工作台功能设计.md",
+      "outputDir": "g:\\Projects\\BidGenerator\\ai_prd",
+      "basename": "AI拍照市调系统-人工复核工作台功能设计",
+      "title": "AI拍照市调系统 · 人工复核工作台功能设计"
+    },
+    {
+      "source": "g:\\Projects\\BidGenerator\\ai_prd\\AI拍照市调系统-比价报告与数据分析功能设计.md",
+      "outputDir": "g:\\Projects\\BidGenerator\\ai_prd",
+      "basename": "AI拍照市调系统-比价报告与数据分析功能设计",
+      "title": "AI拍照市调系统 · 比价报告与数据分析功能设计"
+    },
+    {
+      "source": "g:\\Projects\\BidGenerator\\ai_prd\\AI拍照市调系统-基础数据管理功能设计.md",
+      "outputDir": "g:\\Projects\\BidGenerator\\ai_prd",
+      "basename": "AI拍照市调系统-基础数据管理功能设计",
+      "title": "AI拍照市调系统 · 基础数据管理功能设计"
+    },
+    {
+      "source": "g:\\Projects\\BidGenerator\\ai_prd\\AI拍照市调系统-系统权限管理功能设计.md",
+      "outputDir": "g:\\Projects\\BidGenerator\\ai_prd",
+      "basename": "AI拍照市调系统-系统权限管理功能设计",
+      "title": "AI拍照市调系统 · 系统权限管理功能设计"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "name": "agent-requirement-doc-skill-scripts",
+  "private": true,
+  "version": "0.2.0",
+  "description": "Scripts for 智能体需求文档生成skill"
+}

@@ -1,0 +1,34 @@
+{
+  "documents": [
+    {
+      "source": "g:\\Projects\\BidGenerator\\ai_prd\\PRD-006-客诉工单自动化与智能分类系统\\modules\\客诉工单系统-客诉录入功能设计.md",
+      "outputDir": "g:\\Projects\\BidGenerator\\ai_prd\\PRD-006-客诉工单自动化与智能分类系统\\modules",
+      "baseName": "客诉工单系统-客诉录入功能设计"
+    },
+    {
+      "source": "g:\\Projects\\BidGenerator\\ai_prd\\PRD-006-客诉工单自动化与智能分类系统\\modules\\客诉工单系统-AI智能分类功能设计.md",
+      "outputDir": "g:\\Projects\\BidGenerator\\ai_prd\\PRD-006-客诉工单自动化与智能分类系统\\modules",
+      "baseName": "客诉工单系统-AI智能分类功能设计"
+    },
+    {
+      "source": "g:\\Projects\\BidGenerator\\ai_prd\\PRD-006-客诉工单自动化与智能分类系统\\modules\\客诉工单系统-工单管理功能设计.md",
+      "outputDir": "g:\\Projects\\BidGenerator\\ai_prd\\PRD-006-客诉工单自动化与智能分类系统\\modules",
+      "baseName": "客诉工单系统-工单管理功能设计"
+    },
+    {
+      "source": "g:\\Projects\\BidGenerator\\ai_prd\\PRD-006-客诉工单自动化与智能分类系统\\modules\\客诉工单系统-自动分派与升级功能设计.md",
+      "outputDir": "g:\\Projects\\BidGenerator\\ai_prd\\PRD-006-客诉工单自动化与智能分类系统\\modules",
+      "baseName": "客诉工单系统-自动分派与升级功能设计"
+    },
+    {
+      "source": "g:\\Projects\\BidGenerator\\ai_prd\\PRD-006-客诉工单自动化与智能分类系统\\modules\\客诉工单系统-数据分析与统计功能设计.md",
+      "outputDir": "g:\\Projects\\BidGenerator\\ai_prd\\PRD-006-客诉工单自动化与智能分类系统\\modules",
+      "baseName": "客诉工单系统-数据分析与统计功能设计"
+    },
+    {
+      "source": "g:\\Projects\\BidGenerator\\ai_prd\\PRD-006-客诉工单自动化与智能分类系统\\modules\\客诉工单系统-处理人配置管理功能设计.md",
+      "outputDir": "g:\\Projects\\BidGenerator\\ai_prd\\PRD-006-客诉工单自动化与智能分类系统\\modules",
+      "baseName": "客诉工单系统-处理人配置管理功能设计"
+    }
+  ]
+}
