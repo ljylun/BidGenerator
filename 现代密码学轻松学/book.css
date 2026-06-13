@@ -1,0 +1,8 @@
+﻿body { font-family: "Microsoft YaHei", sans-serif; }
+h1, h2, h3 { font-family: "Microsoft YaHei", sans-serif; }
+code { font-family: Consolas, monospace; }
+h1 { page-break-before: always; }
+h1:first-of-type { page-break-before: avoid; }
+@page { size: A4; margin: 20mm 18mm; }
+pre { white-space: pre-wrap; }
+math[display="block"] { text-align: center; }
