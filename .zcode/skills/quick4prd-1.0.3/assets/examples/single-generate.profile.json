@@ -1,0 +1,6 @@
+{
+  "source": "/absolute/path/to/project/doc/示例项目-用户管理功能设计.md",
+  "outputDir": "/absolute/path/to/project/doc",
+  "baseName": "示例项目-用户管理功能设计",
+  "backupDirName": "backup"
+}

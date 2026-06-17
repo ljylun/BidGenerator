@@ -1,0 +1,13 @@
+{
+  "outputDir": "/absolute/path/to/project/doc",
+  "baseName": "示例项目-用户管理功能设计",
+  "documentTitle": "用户管理功能设计",
+  "projectName": "示例项目",
+  "systemName": "示例管理平台",
+  "documentCode": "PRD-USER-2026-001",
+  "owner": "张三",
+  "createdDate": "2026-04-01",
+  "docVersion": "v0.1",
+  "moduleName": "账号与权限",
+  "menuPath": "系统管理 → 用户管理 → 用户列表"
+}
