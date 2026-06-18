@@ -1,0 +1,28 @@
+input:
+  product_name:
+    type: string
+    description: 分析产品名称
+    required: true
+
+  market:
+    type: string
+    description: 市场（如：中国 / 东南亚）
+    default: 中国
+
+  platform:
+    type: string
+    description: 渠道平台（如：天猫 / 抖音 / 线下）
+    default: 全渠道
+
+  competitor_count:
+    type: int
+    description: 竞品数量
+    default: 5
+
+  analysis_depth:
+    type: string
+    enum: [basic, advanced, deep]
+    default: advanced
+
+output:
+  format: markdown

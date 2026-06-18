@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Reading: Where Do LLMs Still Struggle?</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a' },
+                        accent: { 50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 300: '#86efac', 400: '#4ade80', 500: '#22c55e', 600: '#16a34a', 700: '#15803d', 800: '#166534', 900: '#14532d' },
+                        surface: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a' }
+                    },
+                    fontFamily: { sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        html { scroll-behavior: smooth; }
+        .pass-badge { transition: all 0.3s ease; }
+        .pass-badge:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -5px rgba(59, 130, 246, 0.4); }
+        .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15); }
+        .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .section-divider { background: linear-gradient(90deg, transparent, #e2e8f0, transparent); height: 1px; }
+        .greeting-bg { background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%); }
+        .toc-link { transition: all 0.2s ease; }
+        .toc-link:hover { color: #2563eb; padding-left: 0.5rem; }
+        .cite-badge { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .finding-card { border-left: 4px solid #3b82f6; }
+        .finding-card.warning { border-left-color: #f59e0b; }
+        .finding-card.success { border-left-color: #22c55e; }
+        .finding-card.danger { border-left-color: #ef4444; }
+    </style>
+</head>
+<body class="bg-surface-50 font-sans text-surface-800 antialiased">
+
+    <!-- Header / Hero -->
+    <header class="greeting-bg text-white relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl"></div>
+            <div class="absolute bottom-10 right-10 w-96 h-96 bg-blue-300 rounded-full blur-3xl"></div>
+        </div>
+        <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="cite-badge text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Paper Reading</span>
+                <span class="bg-white/20 text-white text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm">Keshav's Three-Pass Method</span>
+            </div>
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight mb-4">
+                Where Do LLMs Still Struggle?
+            </h1>
+            <p class="text-lg sm:text-xl text-blue-100 font-light mb-6 max-w-3xl">
+                An In-Depth Analysis of Code Generation Benchmarks
+            </p>
+            <div class="flex flex-wrap gap-2 text-sm text-blue-200">
+                <span class="bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm">Amir Molzam Sharifloo</span>
+                <span class="bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm">Maedeh Heydari</span>
+                <span class="bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm">Parsa Kazerooni</span>
+                <span class="bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm">Daniel Maninger</span>
+                <span class="bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm">Mira Mezini</span>
+            </div>
+            <p class="text-blue-300 text-sm mt-4">TU Darmstadt / hessian.AI / ATHENE, Germany</p>
+        </div>
+    </header>
+
+    <!-- Table of Contents -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-surface-200 shadow-sm">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex items-center gap-2 overflow-x-auto text-sm">
+                <span class="font-semibold text-surface-600 whitespace-nowrap">Contents:</span>
+                <a href="#pass1" class="toc-link text-primary-600 hover:text-primary-800 whitespace-nowrap font-medium">Pass 1: Bird's-Eye</a>
+                <span class="text-surface-400">|</a>
+                <a href="#pass2" class="toc-link text-primary-600 hover:text-primary-800 whitespace-nowrap font-medium">Pass 2: Content</a>
+                <span class="text-surface-400">|</span>
+                <a href="#pass3" class="toc-link text-primary-600 hover:text-primary-800 whitespace-nowrap font-medium">Pass 3: Deep Dive</a>
+                <span class="text-surface-400">|</span>
+                <a href="#verdict" class="toc-link text-primary-600 hover:text-primary-800 whitespace-nowrap font-medium">Verdict</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+
+        <!-- ==================== PASS 1 ==================== -->
+        <section id="pass1" class="scroll-mt-16">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="pass-badge bg-primary-600 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-bold shadow-lg shadow-primary-200">1</div>
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-surface-900">Pass 1 — Bird's-Eye View</h2>
+                    <p class="text-surface-500 text-sm mt-1">Quick triage: Category, Context, Correctness, Contributions, Clarity</p>
+                </div>
+            </div>
+
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <!-- Category -->
+                <article class="card-hover bg-white rounded-2xl p-6 shadow-md border border-surface-100">
+                    <div class="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                    </div>
+                    <h3 class="font-bold text-surface-900 mb-2">Category</h3>
+                    <p class="text-surface-600 text-sm leading-relaxed">Empirical study / measurement paper. A systematic diagnostic analysis of LLM failures across code generation benchmarks — not a new model proposal.</p>
+                </article>
+
+                <!-- Context -->
+                <article class="card-hover bg-white rounded-2xl p-6 shadow-md border border-surface-100">
+                    <div class="w-10 h-10 bg-accent-100 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                    </div>
+                    <h3 class="font-bold text-surface-900 mb-2">Context</h3>
+                    <p class="text-surface-600 text-sm leading-relaxed">Builds on HumanEval, MBPP, LiveCodeBench, BigCodeBench. Extends prior error analysis (Wang et al., ICSE 2025) beyond HumanEval to diverse benchmarks.</p>
+                </article>
+
+                <!-- Correctness -->
+                <article class="card-hover bg-white rounded-2xl p-6 shadow-md border border-surface-100">
+                    <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <h3 class="font-bold text-surface-900 mb-2">Correctness</h3>
+                    <p class="text-surface-600 text-sm leading-relaxed">PASS@1 protocol is standard. 6 diverse LLMs provide breadth. 7-category failure grouping is intuitive. APPS exclusion for contamination is prudent.</p>
+                </article>
+
+                <!-- Contributions -->
+                <article class="card-hover bg-white rounded-2xl p-6 shadow-md border border-surface-100 sm:col-span-2 lg:col-span-1">
+                    <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                    </div>
+                    <h3 class="font-bold text-surface-900 mb-2">Contributions</h3>
+                    <ul class="text-surface-600 text-sm space-y-1.5">
+                        <li class="flex items-start gap-2"><span class="text-primary-500 mt-1">&#8226;</span>Task-level results across 4 benchmarks x 6 LLMs (865 tasks)</li>
+                        <li class="flex items-start gap-2"><span class="text-primary-500 mt-1">&#8226;</span>Code complexity measurement with correlation analysis</li>
+                        <li class="flex items-start gap-2"><span class="text-primary-500 mt-1">&#8226;</span>Fine-grained failure inspection of 114 tasks, 4 failure patterns</li>
+                        <li class="flex items-start gap-2"><span class="text-primary-500 mt-1">&#8226;</span>Public GitHub release of data and scripts</li>
+                    </ul>
+                </article>
+
+                <!-- Clarity -->
+                <article class="card-hover bg-white rounded-2xl p-6 shadow-md border border-surface-100 sm:col-span-2 lg:col-span-2">
+                    <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    </div>
+                    <h3 class="font-bold text-surface-900 mb-2">Clarity</h3>
+                    <p class="text-surface-600 text-sm leading-relaxed">Well-structured with RQ-driven organization (RQ1 -> RQ2 -> RQ3). Tables are informative. The logical flow from "which tasks fail" -> "is it complexity?" -> "what are the actual patterns?" is coherent and easy to follow.</p>
+                </article>
+            </div>
+
+            <!-- Decision Banner -->
+            <div class="mt-8 bg-primary-50 border border-primary-200 rounded-2xl p-5 flex items-start gap-4">
+                <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <div>
+                    <p class="font-semibold text-primary-900">Decision: Highly relevant</p>
+                    <p class="text-primary-700 text-sm mt-1">Proceeding to Pass 2 for deeper content understanding.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== PASS 2 ==================== -->
+        <section id="pass2" class="scroll-mt-16">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="pass-badge bg-primary-600 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-bold shadow-lg shadow-primary-200">2</div>
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-surface-900">Pass 2 — Content Grasp</h2>
+                    <p class="text-surface-500 text-sm mt-1">Main thesis, evidence, key figures, gaps, and follow-up references</p>
+                </div>
+            </div>
+
+            <!-- Main Thesis -->
+            <div class="bg-gradient-to-br from-primary-600 to-primary-800 rounded-2xl p-6 sm:p-8 text-white shadow-xl shadow-primary-200 mb-8">
+                <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                    Main Thesis
+                </h3>
+                <p class="text-blue-100 leading-relaxed text-lg">
+                    Despite impressive benchmark scores, LLMs consistently fail on a non-trivial number of code generation tasks (114 across 4 benchmarks), and these failures stem not from code complexity alone but from systematic weaknesses in problem mapping, algorithm design, edge case handling, and formatting — compounded by benchmark design issues.
+                </p>
+            </div>
+
+            <!-- Evidence & Methods -->
+            <h3 class="text-xl font-bold text-surface-900 mb-4">Evidence & Methods</h3>
+
+            <!-- Benchmark Table -->
+            <div class="bg-white rounded-2xl shadow-md border border-surface-100 overflow-hidden mb-6">
+                <div class="p-5 border-b border-surface-100 bg-surface-50">
+                    <h4 class="font-semibold text-surface-800">Experimental Setup</h4>
+                </div>
+                <div class="table-container">
+                    <table class="w-full text-sm">
+                        <thead class="bg-surface-50 text-surface-600 font-semibold">
+                            <tr>
+                                <th class="px-5 py-3 text-left">Benchmark</th>
+                                <th class="px-5 py-3 text-left">Tasks</th>
+                                <th class="px-5 py-3 text-left hidden sm:table-cell">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-surface-100">
+                            <tr class="hover:bg-surface-50 transition-colors">
+                                <td class="px-5 py-3 font-medium text-primary-700">HumanEval</td>
+                                <td class="px-5 py-3 font-mono">164</td>
+                                <td class="px-5 py-3 text-surface-600 hidden sm:table-cell">Basic Python function generation</td>
+                            </tr>
+                            <tr class="hover:bg-surface-50 transition-colors">
+                                <td class="px-5 py-3 font-medium text-primary-700">MBPP</td>
+                                <td class="px-5 py-3 font-mono">378</td>
+                                <td class="px-5 py-3 text-surface-600 hidden sm:table-cell">Python program synthesis (subset)</td>
+                            </tr>
+                            <tr class="hover:bg-surface-50 transition-colors">
+                                <td class="px-5 py-3 font-medium text-primary-700">LiveCodeBench (V6)</td>
+                                <td class="px-5 py-3 font-mono">175</td>
+                                <td class="px-5 py-3 text-surface-600 hidden sm:table-cell">Competitive programming (LeetCode/AtCoder)</td>
+                            </tr>
+                            <tr class="hover:bg-surface-50 transition-colors">
+                                <td class="px-5 py-3 font-medium text-primary-700">BigCodeBench-Hard</td>
+                                <td class="px-5 py-3 font-mono">148</td>
+                                <td class="px-5 py-3 text-surface-600 hidden sm:table-cell">Diverse function calls, complex instructions</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Models -->
+            <div class="flex flex-wrap gap-3 mb-8">
+                <span class="text-sm font-medium text-surface-600 self-center mr-1">Models:</span>
+                <span class="bg-primary-100 text-primary-800 px-3 py-1.5 rounded-lg text-sm font-medium">Claude Sonnet-4</span>
+                <span class="bg-primary-100 text-primary-800 px-3 py-1.5 rounded-lg text-sm font-medium">DeepSeek-V3</span>
+                <span class="bg-primary-100 text-primary-800 px-3 py-1.5 rounded-lg text-sm font-medium">Qwen3-Coder</span>
+                <span class="bg-primary-100 text-primary-800 px-3 py-1.5 rounded-lg text-sm font-medium">GPT-4o</span>
+                <span class="bg-primary-100 text-primary-800 px-3 py-1.5 rounded-lg text-sm font-medium">Llama-3.3-70B</span>
+                <span class="bg-primary-100 text-primary-800 px-3 py-1.5 rounded-lg text-sm font-medium">Mistral-3.2-24B</span>
+            </div>
+
+            <!-- RQ1 Results -->
+            <div class="mb-8">
+                <h3 class="text-xl font-bold text-surface-900 mb-4 flex items-center gap-2">
+                    <span class="bg-amber-100 text-amber-700 text-sm font-bold px-2.5 py-1 rounded-lg">RQ1</span>
+                    Which tasks do LLMs consistently fail at?
+                </h3>
+                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div class="card-hover bg-white rounded-2xl p-5 shadow-md border border-surface-100 text-center">
+                        <p class="text-3xl font-extrabold text-primary-600">114</p>
+                        <p class="text-surface-500 text-sm mt-1">Tasks failed by ALL 6 models</p>
+                    </div>
+                    <div class="card-hover bg-white rounded-2xl p-5 shadow-md border border-surface-100 text-center">
+                        <p class="text-3xl font-extrabold text-red-500">76</p>
+                        <p class="text-surface-500 text-sm mt-1">BCB-Hard failures (51%)</p>
+                    </div>
+                    <div class="card-hover bg-white rounded-2xl p-5 shadow-md border border-surface-100 text-center">
+                        <p class="text-3xl font-extrabold text-amber-500">35</p>
+                        <p class="text-surface-500 text-sm mt-1">LiveCodeBench failures (20%)</p>
+                    </div>
+                    <div class="card-hover bg-white rounded-2xl p-5 shadow-md border border-surface-100 text-center">
+                        <p class="text-3xl font-extrabold text-green-500">1</p>
+                        <p class="text-surface-500 text-sm mt-1">HumanEval failure</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RQ2 Results -->
+            <div class="mb-8">
+                <h3 class="text-xl font-bold text-surface-900 mb-4 flex items-center gap-2">
+                    <span class="bg-amber-100 text-amber-700 text-sm font-bold px-2.5 py-1 rounded-lg">RQ2</span>
+                    To what extent are failures explained by solution complexity?
+                </h3>
+                <div class="bg-white rounded-2xl shadow-md border border-surface-100 overflow-hidden">
+                    <div class="table-container">
+                        <table class="w-full text-sm">
+                            <thead class="bg-surface-50 text-surface-600 font-semibold">
+                                <tr>
+                                    <th class="px-5 py-3 text-left">Benchmark</th>
+                                    <th class="px-5 py-3 text-left">Correlation</th>
+                                    <th class="px-5 py-3 text-left">R²</th>
+                                    <th class="px-5 py-3 text-left">Verdict</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-surface-100">
+                                <tr class="hover:bg-surface-50 transition-colors">
+                                    <td class="px-5 py-3 font-medium">HumanEval</td>
+                                    <td class="px-5 py-3">Weak / NS</td>
+                                    <td class="px-5 py-3 font-mono">—</td>
+                                    <td class="px-5 py-3"><span class="bg-red-100 text-red-700 px-2 py-0.5 rounded text-xs font-medium">Not explained</span></td>
+                                </tr>
+                                <tr class="hover:bg-surface-50 transition-colors">
+                                    <td class="px-5 py-3 font-medium">MBPP</td>
+                                    <td class="px-5 py-3">Weak / NS</td>
+                                    <td class="px-5 py-3 font-mono">—</td>
+                                    <td class="px-5 py-3"><span class="bg-red-100 text-red-700 px-2 py-0.5 rounded text-xs font-medium">Not explained</span></td>
+                                </tr>
+                                <tr class="hover:bg-surface-50 transition-colors">
+                                    <td class="px-5 py-3 font-medium">BCB-Hard</td>
+                                    <td class="px-5 py-3">Weak</td>
+                                    <td class="px-5 py-3 font-mono">~0.14</td>
+                                    <td class="px-5 py-3"><span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-xs font-medium">Marginal</span></td>
+                                </tr>
+                                <tr class="hover:bg-surface-50 transition-colors bg-primary-50/50">
+                                    <td class="px-5 py-3 font-medium">LiveCodeBench</td>
+                                    <td class="px-5 py-3 font-semibold text-primary-700">Strong</td>
+                                    <td class="px-5 py-3 font-mono font-semibold text-primary-700">up to 0.32</td>
+                                    <td class="px-5 py-3"><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-medium">Correlated</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <p class="text-surface-600 text-sm mt-4 italic">
+                    Conclusion: Code complexity alone cannot systematically explain LLM failures. Semantic task properties and benchmark-specific factors play a more significant role.
+                </p>
+            </div>
+
+            <!-- RQ3 Results -->
+            <div class="mb-8">
+                <h3 class="text-xl font-bold text-surface-900 mb-4 flex items-center gap-2">
+                    <span class="bg-amber-100 text-amber-700 text-sm font-bold px-2.5 py-1 rounded-lg">RQ3</span>
+                    What additional task characteristics influence failures?
+                </h3>
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div class="finding-card bg-white rounded-2xl p-6 shadow-md border border-surface-100 card-hover">
+                        <h4 class="font-bold text-surface-900 mb-2">Wrong Problem Mapping</h4>
+                        <p class="text-surface-600 text-sm mb-3">Models interpret tasks as belonging to the wrong problem class (e.g., "balanced brackets" instead of "nested subsequence").</p>
+                        <div class="flex gap-2 text-xs">
+                            <span class="bg-surface-100 text-surface-600 px-2 py-1 rounded">LCB: 20</span>
+                            <span class="bg-surface-100 text-surface-600 px-2 py-1 rounded">BCB: 24</span>
+                        </div>
+                    </div>
+                    <div class="finding-card warning bg-white rounded-2xl p-6 shadow-md border border-surface-100 card-hover">
+                        <h4 class="font-bold text-surface-900 mb-2">Flawed / Incomplete Algorithm</h4>
+                        <p class="text-surface-600 text-sm mb-3">Correct approach but flawed or incomplete steps (e.g., missing non-monotonic trend handling in time series).</p>
+                        <div class="flex gap-2 text-xs">
+                            <span class="bg-surface-100 text-surface-600 px-2 py-1 rounded">LCB: 31</span>
+                            <span class="bg-surface-100 text-surface-600 px-2 py-1 rounded">BCB: 35</span>
+                        </div>
+                    </div>
+                    <div class="finding-card danger bg-white rounded-2xl p-6 shadow-md border border-surface-100 card-hover">
+                        <h4 class="font-bold text-surface-900 mb-2">Edge Case Mishandling</h4>
+                        <p class="text-surface-600 text-sm mb-3">Code fails on uncommon or boundary scenarios (e.g., not recursively traversing subdirectories).</p>
+                        <div class="flex gap-2 text-xs">
+                            <span class="bg-surface-100 text-surface-600 px-2 py-1 rounded">BCB: 27</span>
+                        </div>
+                    </div>
+                    <div class="finding-card bg-white rounded-2xl p-6 shadow-md border border-surface-100 card-hover">
+                        <h4 class="font-bold text-surface-900 mb-2">Formatting Mistakes</h4>
+                        <p class="text-surface-600 text-sm mb-3">Correct algorithm but rejected due to strict I/O requirements (e.g., unquoted digits vs. string literals).</p>
+                        <div class="flex gap-2 text-xs">
+                            <span class="bg-surface-100 text-surface-600 px-2 py-1 rounded">LCB: 10</span>
+                            <span class="bg-surface-100 text-surface-600 px-2 py-1 rounded">BCB: 32</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Literal Interpretation Paradox -->
+                <div class="mt-6 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-2xl p-6">
+                    <h4 class="font-bold text-purple-900 mb-2 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        The "Literal Interpretation" Paradox
+                    </h4>
+                    <p class="text-purple-800 text-sm leading-relaxed">
+                        Llama-3.3-70B sometimes outperforms stronger models on BCB-Hard by following prompts <em>literally</em>, while stronger models (e.g., Claude) apply conventional coding practices that conflict with strict test cases. Example: Claude skips network/broadcast IPs per Python conventions; Llama iterates over all addresses as literally requested.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Gaps & Questions -->
+            <div class="bg-surface-100 rounded-2xl p-6">
+                <h3 class="text-lg font-bold text-surface-900 mb-4">Gaps & Questions</h3>
+                <ul class="space-y-3 text-sm text-surface-700">
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold mt-0.5">1</span>
+                        <span><strong>PASS@1 only</strong> — no PASS@K analysis; a model might succeed on retry, changing the failure categorization.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold mt-0.5">2</span>
+                        <span><strong>No prompt complexity analysis</strong> — acknowledged as a limitation but a significant gap since prompt ambiguity is a key finding.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold mt-0.5">3</span>
+                        <span><strong>Only 6 models</strong> — excludes Gemini, Grok, and smaller models; the Llama "literal interpretation" finding needs broader validation.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold mt-0.5">4</span>
+                        <span><strong>No inter-annotator agreement</strong> reported for the manual failure pattern classification.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold mt-0.5">5</span>
+                        <span><strong>"Wrong problem mapping" vs "edge case mishandling"</strong> — the boundary between these categories could be fuzzy.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- References to Follow -->
+            <div class="mt-8">
+                <h3 class="text-lg font-bold text-surface-900 mb-4">References to Follow</h3>
+                <div class="grid gap-3 sm:grid-cols-2 text-sm">
+                    <a href="https://doi.ieeecomputersociety.org/10.1109/ICSE55347.2025.00180" target="_blank" rel="noopener" class="card-hover flex items-center gap-3 bg-white rounded-xl p-4 border border-surface-100 shadow-sm group">
+                        <span class="w-8 h-8 bg-primary-100 text-primary-600 rounded-lg flex items-center justify-center flex-shrink-0 font-bold text-xs group-hover:bg-primary-600 group-hover:text-white transition-colors">W</span>
+                        <div>
+                            <p class="font-medium text-surface-900 group-hover:text-primary-600 transition-colors">Wang et al., ICSE 2025</p>
+                            <p class="text-surface-500 text-xs">Prior HumanEval error analysis</p>
+                        </div>
+                    </a>
+                    <a href="https://arxiv.org/abs/2107.03374" target="_blank" rel="noopener" class="card-hover flex items-center gap-3 bg-white rounded-xl p-4 border border-surface-100 shadow-sm group">
+                        <span class="w-8 h-8 bg-primary-100 text-primary-600 rounded-lg flex items-center justify-center flex-shrink-0 font-bold text-xs group-hover:bg-primary-600 group-hover:text-white transition-colors">H</span>
+                        <div>
+                            <p class="font-medium text-surface-900 group-hover:text-primary-600 transition-colors">HumanEval (Chen et al., 2021)</p>
+                            <p class="text-surface-500 text-xs">Original code generation benchmark</p>
+                        </div>
+                    </a>
+                    <a href="https://arxiv.org/abs/2404.00699" target="_blank" rel="noopener" class="card-hover flex items-center gap-3 bg-white rounded-xl p-4 border border-surface-100 shadow-sm group">
+                        <span class="w-8 h-8 bg-primary-100 text-primary-600 rounded-lg flex items-center justify-center flex-shrink-0 font-bold text-xs group-hover:bg-primary-600 group-hover:text-white transition-colors">L</span>
+                        <div>
+                            <p class="font-medium text-surface-900 group-hover:text-primary-600 transition-colors">LiveCodeBench (Jain et al., 2024)</p>
+                            <p class="text-surface-500 text-xs">Contamination-free evaluation</p>
+                        </div>
+                    </a>
+                    <a href="https://arxiv.org/abs/2406.15877" target="_blank" rel="noopener" class="card-hover flex items-center gap-3 bg-white rounded-xl p-4 border border-surface-100 shadow-sm group">
+                        <span class="w-8 h-8 bg-primary-100 text-primary-600 rounded-lg flex items-center justify-center flex-shrink-0 font-bold text-xs group-hover:bg-primary-600 group-hover:text-white transition-colors">B</span>
+                        <div>
+                            <p class="font-medium text-surface-900 group-hover:text-primary-600 transition-colors">BigCodeBench (Zhuo et al., 2025)</p>
+                            <p class="text-surface-500 text-xs">Diverse function calls benchmark</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== PASS 3 ==================== -->
+        <section id="pass3" class="scroll-mt-16">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="pass-badge bg-primary-600 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-bold shadow-lg shadow-primary-200">3</div>
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-surface-900">Pass 3 — Deep Understanding</h2>
+                    <p class="text-surface-500 text-sm mt-1">Virtual re-implementation, innovations, assumptions, weaknesses, verdict</p>
+                </div>
+            </div>
+
+            <!-- Structural Reconstruction -->
+            <div class="bg-white rounded-2xl shadow-md border border-surface-100 p-6 mb-8">
+                <h3 class="text-lg font-bold text-surface-900 mb-4">Structural Reconstruction</h3>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <div class="flex-1 bg-primary-50 rounded-xl p-4 border border-primary-100">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="bg-primary-600 text-white text-xs font-bold px-2 py-0.5 rounded">RQ1</span>
+                            <span class="text-sm font-semibold text-primary-900">Broad Sweep</span>
+                        </div>
+                        <p class="text-primary-700 text-sm">6 models x 865 tasks -> identify 114 universally-failed tasks</p>
+                    </div>
+                    <div class="hidden sm:flex items-center text-surface-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                    </div>
+                    <div class="flex-1 bg-amber-50 rounded-xl p-4 border border-amber-100">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="bg-amber-600 text-white text-xs font-bold px-2 py-0.5 rounded">RQ2</span>
+                            <span class="text-sm font-semibold text-amber-900">Hypothesis Test</span>
+                        </div>
+                        <p class="text-amber-700 text-sm">Measure complexity -> test correlation -> reject "complexity explains failures"</p>
+                    </div>
+                    <div class="hidden sm:flex items-center text-surface-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                    </div>
+                    <div class="flex-1 bg-accent-50 rounded-xl p-4 border border-accent-100">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="bg-accent-600 text-white text-xs font-bold px-2 py-0.5 rounded">RQ3</span>
+                            <span class="text-sm font-semibold text-accent-900">Qualitative Deep Dive</span>
+                        </div>
+                        <p class="text-accent-700 text-sm">Manual inspection of 114 failures -> 4 patterns + benchmark design issues</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Innovations & Implicit Assumptions side by side -->
+            <div class="grid gap-6 lg:grid-cols-2 mb-8">
+                <div>
+                    <h3 class="text-lg font-bold text-surface-900 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                        Innovations
+                    </h3>
+                    <ul class="space-y-3">
+                        <li class="finding-card success bg-white rounded-xl p-4 shadow-sm border border-surface-100">
+                            <p class="text-sm text-surface-700"><strong class="text-green-700">"Literal interpretation" paradox</strong> — weaker models outperforming stronger ones by being more literal is genuinely novel and has implications for evaluation methodology.</p>
+                        </li>
+                        <li class="finding-card success bg-white rounded-xl p-4 shadow-sm border border-surface-100">
+                            <p class="text-sm text-surface-700"><strong class="text-green-700">Benchmark design critique</strong> — identifying "ambiguous prompt + overspecified test" as a systematic issue in BCB-Hard is valuable for benchmark methodology.</p>
+                        </li>
+                        <li class="finding-card success bg-white rounded-xl p-4 shadow-sm border border-surface-100">
+                            <p class="text-sm text-surface-700"><strong class="text-green-700">Multi-benchmark convergence</strong> — 114 universally-failed tasks across 4 benchmarks x 6 models is a robust, actionable finding.</p>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-surface-900 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                        Implicit Assumptions
+                    </h3>
+                    <ul class="space-y-3">
+                        <li class="finding-card warning bg-white rounded-xl p-4 shadow-sm border border-surface-100">
+                            <p class="text-sm text-surface-700"><strong class="text-amber-700">Ground-truth solutions = gold standard</strong> — assumes reference solution complexity is the "correct" level, but alternative correct solutions may differ.</p>
+                        </li>
+                        <li class="finding-card warning bg-white rounded-xl p-4 shadow-sm border border-surface-100">
+                            <p class="text-sm text-surface-700"><strong class="text-amber-700">Test cases are correct and complete</strong> — critiques benchmark design but still treats test cases as ground truth.</p>
+                        </li>
+                        <li class="finding-card warning bg-white rounded-xl p-4 shadow-sm border border-surface-100">
+                            <p class="text-sm text-surface-700"><strong class="text-amber-700">Single-run evaluation is representative</strong> — PASS@1 throughout; stochastic variation is not accounted for.</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Weaknesses & Strong Points -->
+            <div class="grid gap-6 lg:grid-cols-2 mb-8">
+                <div class="bg-red-50 rounded-2xl p-6 border border-red-100">
+                    <h3 class="text-lg font-bold text-red-900 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Weaknesses
+                    </h3>
+                    <ul class="space-y-2 text-sm text-red-800">
+                        <li class="flex items-start gap-2"><span class="mt-1 text-red-400">&#8226;</span>No statistical significance testing for failure pattern distribution (Table IV)</li>
+                        <li class="flex items-start gap-2"><span class="mt-1 text-red-400">&#8226;</span>Complexity metrics are standard (CC, length, nesting) — nothing novel in measurement</li>
+                        <li class="flex items-start gap-2"><span class="mt-1 text-red-400">&#8226</span>Limited generalizability — all Python function-level; may not transfer to repo-level or non-Python</li>
+                        <li class="flex items-start gap-2"><span class="mt-1 text-red-400">&#8226</span>"Wrong problem mapping" is somewhat tautological — describes rather than explains</li>
+                        <li class="flex items-start gap-2"><span class="mt-1 text-red-400">&#8226</span>No actionable mitigation — only high-level future directions</li>
+                    </ul>
+                </div>
+                <div class="bg-green-50 rounded-2xl p-6 border border-green-100">
+                    <h3 class="text-lg font-bold text-green-900 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Strong Points
+                    </h3>
+                    <ul class="space-y-2 text-sm text-green-800">
+                        <li class="flex items-start gap-2"><span class="mt-1 text-green-400">&#8226;</span>Reproducibility — public GitHub release of data and scripts</li>
+                        <li class="flex items-start gap-2"><span class="mt-1 text-green-400">&#8226;</span>Practical value — 114 universally-failed tasks as a curated dataset</li>
+                        <li class="flex items-start gap-2"><span class="mt-1 text-green-400">&#8226;</span>Methodological rigor — quantitative + qualitative analysis combined</li>
+                        <li class="flex items-start gap-2"><span class="mt-1 text-green-400">&#8226;</span>Important negative result — complexity does NOT explain failures redirects the field</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Future Directions -->
+            <div class="bg-white rounded-2xl shadow-md border border-surface-100 p-6 mb-8">
+                <h3 class="text-lg font-bold text-surface-900 mb-4">Future Directions</h3>
+                <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    <div class="flex items-start gap-3 p-3 rounded-xl bg-surface-50">
+                        <span class="w-7 h-7 bg-primary-100 text-primary-700 rounded-lg flex items-center justify-center flex-shrink-0 font-bold text-xs">1</span>
+                        <p class="text-sm text-surface-700">Repository-level analysis (SWE-Bench) — do patterns hold for multi-file tasks?</p>
+                    </div>
+                    <div class="flex items-start gap-3 p-3 rounded-xl bg-surface-50">
+                        <span class="w-7 h-7 bg-primary-100 text-primary-700 rounded-lg flex items-center justify-center flex-shrink-0 font-bold text-xs">2</span>
+                        <p class="text-sm text-surface-700">Prompt complexity measurement — combining prompt + solution complexity</p>
+                    </div>
+                    <div class="flex items-start gap-3 p-3 rounded-xl bg-surface-50">
+                        <span class="w-7 h-7 bg-primary-100 text-primary-700 rounded-lg flex items-center justify-center flex-shrink-0 font-bold text-xs">3</span>
+                        <p class="text-sm text-surface-700">Targeted training strategies — failure patterns informing data curation / RLHF</p>
+                    </div>
+                    <div class="flex items-start gap-3 p-3 rounded-xl bg-surface-50">
+                        <span class="w-7 h-7 bg-primary-100 text-primary-700 rounded-lg flex items-center justify-center flex-shrink-0 font-bold text-xs">4</span>
+                        <p class="text-sm text-surface-700">Dynamic evaluation — PASS@K or agentic self-debugging approaches</p>
+                    </div>
+                    <div class="flex items-start gap-3 p-3 rounded-xl bg-surface-50">
+                        <span class="w-7 h-7 bg-primary-100 text-primary-700 rounded-lg flex items-center justify-center flex-shrink-0 font-bold text-xs">5</span>
+                        <p class="text-sm text-surface-700">Cross-language generalization — are patterns Python-specific?</p>
+                    </div>
+                    <div class="flex items-start gap-3 p-3 rounded-xl bg-surface-50">
+                        <span class="w-7 h-7 bg-primary-100 text-primary-700 rounded-lg flex items-center justify-center flex-shrink-0 font-bold text-xs">6</span>
+                        <p class="text-sm text-surface-700">Failure-pattern-based benchmarks — to better discriminate model capabilities</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== VERDICT ==================== -->
+        <section id="verdict" class="scroll-mt-16">
+            <div class="bg-gradient-to-br from-surface-900 to-surface-800 rounded-2xl p-8 sm:p-10 text-white shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl"></div>
+                <div class="absolute bottom-0 left-0 w-48 h-48 bg-accent-500/10 rounded-full blur-3xl"></div>
+                <div class="relative">
+                    <div class="flex items-center gap-3 mb-6">
+                        <svg class="w-8 h-8 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        <h2 class="text-2xl sm:text-3xl font-bold">Overall Verdict</h2>
+                    </div>
+
+                    <div class="flex items-center gap-4 mb-6">
+                        <span class="bg-accent-500 text-white font-bold px-5 py-2 rounded-xl text-lg shadow-lg shadow-accent-500/30">Accept</span>
+                        <span class="text-surface-300 text-sm">Solid empirical contribution</span>
+                    </div>
+
+                    <p class="text-surface-200 leading-relaxed text-lg mb-6">
+                        A well-executed diagnostic study that makes genuine contributions by (a) identifying concrete tasks all models fail, (b) debunking the "complexity explains failures" hypothesis for most benchmarks, and (c) cataloging systematic failure patterns.
+                    </p>
+
+                    <div class="grid gap-4 sm:grid-cols-3">
+                        <div class="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                            <p class="text-accent-400 font-bold text-sm mb-1">Key Strength</p>
+                            <p class="text-surface-300 text-sm">The "literal interpretation paradox" finding alone makes this paper worth reading</p>
+                        </div>
+                        <div class="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                            <p class="text-amber-400 font-bold text-sm mb-1">Main Limitation</p>
+                            <p class="text-surface-300 text-sm">PASS@1-only evaluation, Python-only scope, no mitigation strategies</p>
+                        </div>
+                        <div class="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                            <p class="text-primary-400 font-bold text-sm mb-1">Impact</p>
+                            <p class="text-surface-300 text-sm">Redirects the field toward semantic/task-level explanations for LLM failures</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-surface-200 bg-white mt-16">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-surface-500">
+                <p>Generated with Keshav's Three-Pass Method</p>
+                <p>Based on: S. Keshav, "How to Read a Paper," ACM SIGCOMM CCR, 2007</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
