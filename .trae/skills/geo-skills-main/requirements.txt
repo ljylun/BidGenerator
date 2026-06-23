@@ -1,0 +1,13 @@
+# GEO Skills Suite legacy Python dependencies
+#
+# Default learner/runtime path is Node.js only. Do NOT install this file for
+# normal GEO Skills usage. It is kept only for maintainers who intentionally
+# run legacy Python compatibility scripts.
+
+# Optional legacy API helpers
+requests>=2.28.0
+python-dotenv>=1.0.0
+
+
+# Optional legacy Feishu/Bitable sync
+# baseopensdk>=0.2.0
