@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/ownership" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+				</style><style type="text/css">
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff">
+    <div class="contentwrapper"><table role="presentation" id="header"><tr><td class="title">Form 144 Filer Information</td><td rowspan="2" class="center">
+						UNITED STATES
+						<br>
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+						<br><br>
+						Form 144
+						<br><br><div style="font-size:.9em;">
+							NOTICE OF PROPOSED SALE OF SECURITIES
+							<br>
+							PURSUANT TO RULE 144 UNDER THE SECURITIES ACT OF 1933
+						</div></td><td></td></tr><tr><td class="side" style="text-align: center;vertical-align:middle"><p>
+							FORM 144</p></td><td width="25%"></td></tr></table></div><div id="info"><div class="contentwrapper"><div class="content"><h1>144: Filer Information</h1><table role="presentation" class="filerInformation"><tr><td class="label">Filer CIK</td><td><div class="fakeBox">0002050912</div></td></tr><tr><td class="label">Filer CCC</td><td><div class="fakeBox">XXXXXXXX</div></td></tr><tr><td class="label">
+								Is this a LIVE or TEST Filing?
+							</td><td><img src="/Images/radio-checked.jpg" alt="Radio button checked"> LIVE
+												<img src="/Images/radio-unchecked.jpg" alt="Radio button not checked"> TEST
+											</td></tr><tr><td><h4><em>Submission Contact Information</em></h4></td></tr><tr><td class="label">Name</td><td><div class="fakeBox"></div></td></tr><tr><td class="label">Phone</td><td><div class="fakeBox"></div></td></tr><tr><td class="label">E-Mail Address</td><td><div class="fakeBox"></div></td></tr></table></div></div></div>
+    <div class="content"><h1>144: Issuer Information</h1><div class="form1"><table role="presentation" class="filingInformation" id="submissionInformation"><tr><td class="label">Name of Issuer</td><td><div class="fakeBox">Apple Inc.</div></td></tr><tr><td class="label">SEC File Number</td><td><div class="fakeBox">001-36743</div></td></tr><tr><td class="label">Address of Issuer</td><td><div class="fakeBox">One Apple Park Way<br>Cupertino<br>
+				CALIFORNIA
+			<br>95014</div></td></tr><tr><td class="label">Phone</td><td><div class="fakeBox">4089961010</div></td></tr><tr><td class="label">Name of Person for Whose Account the Securities are To Be Sold</td><td><div class="fakeBox">KEVAN PAREKH</div></td></tr><tr><td colspan="2"><div class="information" style="text-align:justify">
+						See the definition of "person" in paragraph (a) of Rule 144. Information is to be given not only as to the person for whose account  
+						the securities are to be sold but also as to all other persons included in that definition. In addition, information shall be given 
+						as to sales by all persons whose sales are required by paragraph (e) of Rule 144 to be aggregated with sales  
+						for the account of the person filing this notice.
+					<br><br></div></td></tr><tr><td class="label">Relationship to Issuer</td><td><div class="fakeBox">Officer</div></td></tr></table></div><h1>144: Securities Information</h1><div class="form1"><table role="presentation" class="tableClass" id="submissionInformation"><tr width="100%" class="tableClassWithBg"><th width="23%" class="tableClass">Title of the Class of Securities To Be Sold</th><th width="22%" class="tableClass">Name and Address of the Broker</th><th width="11%" class="tableClass">Number of Shares or Other Units To Be Sold</th><th width="12%" class="tableClass">Aggregate Market Value</th><th width="11%" class="tableClass">Number of Shares or Other Units Outstanding</th><th width="8%" class="tableClass">Approximate Date of Sale</th><th width="12%" class="tableClass">Name the Securities Exchange</th></tr><tr width="100%" class="tableClass"><td width="23%" class="tableClass">Common</td><td width="22%" class="tableClass"><div>Morgan Stanley Smith Barney LLC Executive Financial Services<br>1 New York Plaza<br>8th Floor<br>New York
+								 
+								NY
+								 
+								10004</div></td><td width="11%" class="tableClass">4199</td><td width="12%" class="tableClass">1046978.66</td><td width="11%" class="tableClass">14840390000</td><td width="8%" class="tableClass">10/16/2025</td><td width="12%" class="tableClass"><div>NASDAQ</div></td></tr></table></div><br><br><div class="information" style="text-align:justify">
+				Furnish the following information with respect to the acquisition of the securities to be sold and with respect to the payment
+				of all or any part of the purchase price or other consideration therefor:
+			</div><h1>144: Securities To Be Sold</h1><div class="form1"><table role="presentation" class="tableClass" id="securitiesToBeSold"><tr width="100%" class="tableClassWithBg"><th width="14%" class="tableClassRight">Title of the Class</th><th width="8%" class="tableClass">Date you Acquired</th><th width="16%" class="tableClass">Nature of Acquisition Transaction</th><th width="14%" class="tableClass">Name of Person from Whom Acquired</th><th width="4%" class="tableClass">Is this a Gift?</th><th width="8%" class="tableClass">Date Donor Acquired</th><th width="12%" class="tableClass">Amount of Securities Acquired</th><th width="8%" class="tableClass">Date of Payment</th><th width="16%" class="tableClassLeft">Nature of Payment <b>*</b></th></tr><tr width="100%" class="tableClass"><td width="14%" class="tableClassRight">Common</td><td width="8%" class="tableClass">10/15/2025</td><td width="16%" class="tableClass">Restricted Stock Units</td><td width="14%" class="tableClass">Issuer</td><td width="4%" class="tableClass"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td><td width="8%" class="tableClass"></td><td width="12%" class="tableClass">4199</td><td width="8%" class="tableClass">10/15/2025</td><td width="16%" class="tableClassLeft">N/A</td></tr></table><br><div class="information" style="text-align:justify"><b>*</b> If the securities were purchased and full payment therefor was not made in cash at the time of purchase, explain in the table or in a note 
+			thereto the nature of the consideration given. If the consideration consisted of any note or other obligation, or if payment was made
+			in installments describe the arrangement and state when the note or other obligation was discharged in full or the last installment paid.
+		</div><br></div><br><br><div class="information" style="text-align:justify">
+				Furnish the following information as to all securities of the issuer sold during the past 3 months by the person for whose account the securities are to be sold.
+			</div><h1>144: Securities Sold During The Past 3 Months</h1><table role="presentation" class="filingInformation" id="soldInPast3Months"><tr><td class="label">Nothing to Report</td><td><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr></table><h1>144: Remarks and Signature</h1><div class="form1"><table role="presentation" class="filingInformation" id="submissionInformation"><tr><td class="label">Remarks</td><td><div class="fakeBox"></div></td></tr><tr><td class="label">Date of Notice</td><td><div class="fakeBox">10/16/2025</div></td></tr><tr><td class="label">Date of Plan Adoption or Giving of Instruction, If Relying on Rule 10b5-1</td><td><div class="fakeBox">11/26/2024</div></td></tr><tr><td colspan="2"><h4><em>ATTENTION:</em></h4></td></tr><tr><td colspan="2" style="text-align:justify">
+					The person for whose account the securities to which this notice relates are to be sold hereby represents by signing
+					this notice that he does not know any material adverse information in regard to the current and prospective
+					operations of the Issuer of the securities to be sold which has not been publicly disclosed. If such person has
+					adopted a written trading plan or given trading instructions to satisfy Rule 10b5-1 under the Exchange Act, by
+					signing the form and indicating the date that the plan was adopted or the instruction given, that person makes
+					such representation as of the plan adoption or instruction date.
+				</td></tr><tr><td class="label">Signature</td><td><div class="fakeBox">/s/ Kevan Parekh</div></td></tr><tr><td colspan="2"><h4 style="text-align:center"><em>ATTENTION: Intentional misstatements or omission of facts constitute Federal Criminal Violations (See 18 U.S.C. 1001)</em></h4></td></tr></table></div></div>
+</body></html>
