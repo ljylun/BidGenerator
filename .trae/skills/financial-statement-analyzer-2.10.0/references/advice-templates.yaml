@@ -1,0 +1,378 @@
+# ============================================================================
+# 实用建议模板库
+# ============================================================================
+# 基于诊断结果自动匹配并生成分岗位行动清单
+#
+# 作者: 优方皑尔 Uform Ai
+# 版本: v1.0.0
+# ============================================================================
+
+metadata:
+  version: "1.0.0"
+  total_templates: 10
+  last_updated: "2026-06-14"
+
+advice_templates:
+  # ==========================================================================
+  # 存货积压+毛利率虚高
+  # ==========================================================================
+  inventory_overproduction:
+    trigger_signals: ["R-02", "R-16"]
+    severity: "P0"
+    scenario: "存货增速远超成本增速，毛利率虚高"
+    advice:
+      operations:
+        - action: "评估可变现净值，对滞销品计提跌价"
+          owner: "财务部"
+          deadline: "1周内"
+          priority: "P0"
+        - action: "减产去库存，按订单拉动生产"
+          owner: "生产部"
+          deadline: "立即执行"
+          priority: "P0"
+        - action: "对长库龄存货分类处置（促销/报废/返工）"
+          owner: "仓储部+销售部"
+          deadline: "2周内"
+          priority: "P0"
+        - action: "建立安全库存预警机制，超量自动停线"
+          owner: "生产部+IT部"
+          deadline: "1个月内"
+          priority: "P1"
+      finance:
+        - action: "重估存货可变现净值"
+          owner: "财务部"
+          deadline: "1周内"
+          priority: "P0"
+        - action: "足额计提存货跌价准备"
+          owner: "财务部"
+          deadline: "当月"
+          priority: "P0"
+        - action: "还原真实毛利率向管理层报告"
+          owner: "财务部"
+          deadline: "当月"
+          priority: "P0"
+      strategy:
+        - action: "评估是否暂停非订单驱动的生产"
+          owner: "管理层"
+          deadline: "当月"
+          priority: "P0"
+        - action: "修正基于虚高利润的业绩考核目标"
+          owner: "管理层"
+          deadline: "当月"
+          priority: "P0"
+        - action: "评估产品线盈利能力，淘汰亏损产品"
+          owner: "管理层+销售部"
+          deadline: "季度"
+          priority: "P1"
+
+  # ==========================================================================
+  # 应收账款膨胀+经营CF恶化
+  # ==========================================================================
+  ar_aggressive:
+    trigger_signals: ["R-01", "R-13", "R-15"]
+    severity: "P0"
+    scenario: "应收膨胀，赊销激进，回款困难"
+    advice:
+      operations:
+        - action: "收紧信用政策，对新客户执行预付款制度"
+          owner: "销售部"
+          deadline: "立即执行"
+          priority: "P0"
+        - action: "对超期应收启动法律催收程序"
+          owner: "法务部"
+          deadline: "2周内"
+          priority: "P0"
+        - action: "设立回款KPI纳入销售考核（权重≥30%）"
+          owner: "人力资源部+销售部"
+          deadline: "下个考核周期"
+          priority: "P1"
+      finance:
+        - action: "逐客户分析账龄，对高风险客户单独评估坏账"
+          owner: "财务部"
+          deadline: "2周内"
+          priority: "P0"
+        - action: "引入保理/应收账款融资改善现金流"
+          owner: "财务部"
+          deadline: "1个月内"
+          priority: "P1"
+        - action: "建立应收账款周报制度，跟踪回款进度"
+          owner: "财务部"
+          deadline: "持续"
+          priority: "P1"
+      strategy:
+        - action: "评估主要客户的信用风险，调整客户结构"
+          owner: "管理层"
+          deadline: "季度"
+          priority: "P1"
+        - action: "考虑从赊销模式向预付费/订阅模式转型"
+          owner: "管理层"
+          deadline: "中长期"
+          priority: "P2"
+
+  # ==========================================================================
+  # 预收账款/合同负债剧烈下降
+  # ==========================================================================
+  contract_liability_decline:
+    trigger_signals: ["R-14"]
+    severity: "P1"
+    scenario: "合同负债下降→提前确认收入"
+    advice:
+      operations:
+        - action: "停止提前确认收入的销售行为"
+          owner: "销售部"
+          deadline: "立即执行"
+          priority: "P0"
+        - action: "按合同履约进度正确确认收入"
+          owner: "财务部"
+          deadline: "立即执行"
+          priority: "P0"
+      finance:
+        - action: "对已提前确认的收入做追溯调整方案"
+          owner: "财务部"
+          deadline: "当月"
+          priority: "P0"
+        - action: "建立合同收入确认内部审核制度"
+          owner: "财务部"
+          deadline: "2个月内"
+          priority: "P1"
+      strategy:
+        - action: "评估收入确认政策变更对业绩的影响"
+          owner: "管理层"
+          deadline: "当月"
+          priority: "P1"
+
+  # ==========================================================================
+  # 研发资本化率过高
+  # ==========================================================================
+  rd_capitalization_aggressive:
+    trigger_signals: ["R-20"]
+    severity: "P0"
+    scenario: "研发资本化率过高→虚增利润"
+    advice:
+      operations:
+        - action: "严格区分研究阶段与开发阶段"
+          owner: "研发部+财务部"
+          deadline: "立即执行"
+          priority: "P0"
+        - action: "对已资本化项目逐项复核5条件"
+          owner: "财务部"
+          deadline: "1个月内"
+          priority: "P0"
+      finance:
+        - action: "对不满足条件的资本化项目转费用化"
+          owner: "财务部"
+          deadline: "当月"
+          priority: "P0"
+        - action: "建立研发支出资本化内部审批流程"
+          owner: "财务部"
+          deadline: "2个月内"
+          priority: "P1"
+        - action: "测算资本化转费用化对利润的影响"
+          owner: "财务部"
+          deadline: "1周内"
+          priority: "P0"
+      strategy:
+        - action: "对标同行业研发资本化政策"
+          owner: "管理层"
+          deadline: "季度"
+          priority: "P1"
+
+  # ==========================================================================
+  # 短债长投错配
+  # ==========================================================================
+  maturity_mismatch:
+    trigger_signals: ["R-19"]
+    severity: "P0"
+    scenario: "短债长投→流动性危机"
+    advice:
+      operations: []
+      finance:
+        - action: "制定债务期限结构优化方案，将短期债务置换为长期"
+          owner: "财务部"
+          deadline: "1个月内"
+          priority: "P0"
+        - action: "与银行协商延长贷款期限"
+          owner: "财务部"
+          deadline: "1周内"
+          priority: "P0"
+        - action: "紧急情况启动资产处置预案（列出可变现资产清单）"
+          owner: "财务部"
+          deadline: "1周内"
+          priority: "P0"
+        - action: "建立债务到期预警台账，提前3个月预警"
+          owner: "财务部"
+          deadline: "2周内"
+          priority: "P1"
+      strategy:
+        - action: "暂停大额资本开支，以经营现金流还债"
+          owner: "管理层"
+          deadline: "立即执行"
+          priority: "P0"
+        - action: "评估在建工程的必要性与优先级"
+          owner: "管理层"
+          deadline: "当月"
+          priority: "P1"
+
+  # ==========================================================================
+  # 经营CF持续为负
+  # ==========================================================================
+  operating_cf_negative:
+    trigger_signals: ["R-01", "R-15"]
+    severity: "P0"
+    scenario: "经营现金流持续为负→造血能力不足"
+    advice:
+      operations:
+        - action: "启动现金流改善专项：压缩应收、加速去库存、延长应付"
+          owner: "跨部门"
+          deadline: "立即执行"
+          priority: "P0"
+      finance:
+        - action: "逐月编制滚动现金流预算，周度监控"
+          owner: "财务部"
+          deadline: "持续"
+          priority: "P0"
+        - action: "设立现金流红线：可用现金不得低于3个月运营支出"
+          owner: "财务部"
+          deadline: "立即执行"
+          priority: "P0"
+        - action: "必要时启动股权融资或引入战略投资者"
+          owner: "财务部+管理层"
+          deadline: "评估中"
+          priority: "P1"
+      strategy:
+        - action: "重新评估当前业务模式的可持续性"
+          owner: "管理层"
+          deadline: "季度"
+          priority: "P1"
+        - action: "考虑战略收缩：剥离亏损业务线"
+          owner: "管理层"
+          deadline: "季度"
+          priority: "P1"
+
+  # ==========================================================================
+  # 存贷双高
+  # ==========================================================================
+  cash_debt_paradox:
+    trigger_signals: ["R-03", "R-16"]
+    severity: "P0"
+    scenario: "存贷双高→资金可能被挪用"
+    advice:
+      operations: []
+      finance:
+        - action: "对全部银行账户发函确认余额及受限情况"
+          owner: "财务部+审计部"
+          deadline: "立即执行"
+          priority: "P0"
+        - action: "逐笔核对银行流水与账面记录"
+          owner: "财务部"
+          deadline: "2周内"
+          priority: "P0"
+        - action: "核查所有保证金、冻结、质押资金"
+          owner: "财务部"
+          deadline: "1周内"
+          priority: "P0"
+        - action: "重新计算利息收入/支出合理性"
+          owner: "财务部"
+          deadline: "1周内"
+          priority: "P0"
+      strategy:
+        - action: "如确认资金异常，立即成立专项工作组"
+          owner: "董事会"
+          deadline: "立即执行"
+          priority: "P0"
+        - action: "评估是否需要进行独立第三方专项审计"
+          owner: "审计委员会"
+          deadline: "当月"
+          priority: "P1"
+
+  # ==========================================================================
+  # 商誉减值滞后
+  # ==========================================================================
+  goodwill_impairment_lag:
+    trigger_signals: ["R-05", "R-17"]
+    severity: "P0"
+    scenario: "商誉减值滞后→未来爆雷"
+    advice:
+      operations: []
+      finance:
+        - action: "对被收购标的做独立估值，正视减值风险"
+          owner: "财务部+外部评估"
+          deadline: "2周内"
+          priority: "P0"
+        - action: "主动计提减值（一次性出清优于逐年小刀割肉）"
+          owner: "财务部"
+          deadline: "当月"
+          priority: "P0"
+        - action: "对业绩不达标的收购标的启动对赌补偿程序"
+          owner: "法务部+财务部"
+          deadline: "1个月内"
+          priority: "P1"
+      strategy:
+        - action: "未来并购严格控制溢价率"
+          owner: "管理层"
+          deadline: "长期"
+          priority: "P1"
+        - action: "评估是否需要剥离非核心收购资产"
+          owner: "管理层"
+          deadline: "季度"
+          priority: "P1"
+
+  # ==========================================================================
+  # 扣非净利持续低于净利
+  # ==========================================================================
+  recurring_profit_low:
+    trigger_signals: []
+    severity: "P1"
+    scenario: "扣非净利持续低于净利→盈利依赖非经常项目"
+    advice:
+      operations:
+        - action: "聚焦主业盈利能力提升"
+          owner: "各部门"
+          deadline: "持续"
+          priority: "P0"
+      finance:
+        - action: "减少对非经常性损益的依赖（政府补助/资产处置）"
+          owner: "财务部"
+          deadline: "持续"
+          priority: "P1"
+        - action: "如长期依赖非经常损益维持盈利，应重新评估业务可持续性"
+          owner: "财务部"
+          deadline: "季度"
+          priority: "P1"
+      strategy:
+        - action: "评估核心业务的竞争力和盈利模式"
+          owner: "管理层"
+          deadline: "季度"
+          priority: "P1"
+
+  # ==========================================================================
+  # 毛利率异常波动
+  # ==========================================================================
+  gross_margin_volatility:
+    trigger_signals: []
+    severity: "P1"
+    scenario: "毛利率异常波动→成本核算不准或降价甩卖"
+    advice:
+      operations:
+        - action: "重新核算产品成本，消除成本分摊偏差"
+          owner: "财务部+生产部"
+          deadline: "2周内"
+          priority: "P0"
+        - action: "区分降价促销与正常销售，单独分析"
+          owner: "销售部+财务部"
+          deadline: "当月"
+          priority: "P1"
+      finance:
+        - action: "建立毛利率异常预警机制（偏差>3pp触发）"
+          owner: "财务部"
+          deadline: "1个月内"
+          priority: "P1"
+        - action: "优化产品组合，淘汰低毛利产品"
+          owner: "财务部+销售部"
+          deadline: "季度"
+          priority: "P1"
+      strategy:
+        - action: "通过技术升级或供应链优化降低单位成本"
+          owner: "管理层"
+          deadline: "中长期"
+          priority: "P2"

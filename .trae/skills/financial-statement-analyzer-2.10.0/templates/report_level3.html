@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财务报表分析报告 — 第三级：专家会诊</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  :root { --bg: #f5f7fa; --card-bg: #fff; --text: #2c3e50; --text-secondary: #7f8c8d;
+    --green: #27ae60; --yellow: #f39c12; --orange: #e67e22; --red: #e74c3c; --skull: #8b0000;
+    --border: #e0e4e8; --radius: 12px; --shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  * { margin:0;padding:0;box-sizing:border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background:var(--bg); color:var(--text); line-height:1.6; padding:20px; }
+  .container { max-width:1200px; margin:0 auto; }
+  .header { background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%); color:#fff; padding:28px 36px;
+    border-radius:var(--radius); margin-bottom:20px; }
+  .header h1 { font-size:24px; }
+  .header .meta { font-size:13px; opacity:0.8; margin-top:6px; }
+  .card { background:var(--card-bg); border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:24px; margin-bottom:16px; border:1px solid var(--border); }
+  .card-title { font-size:17px; font-weight:700; margin-bottom:16px; border-bottom:2px solid #2563eb;
+    padding-bottom:8px; }
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .chart-container { width:100%; height:400px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { padding:8px 12px; border-bottom:1px solid var(--border); text-align:right; }
+  th { background:var(--bg); font-weight:600; color:var(--text-secondary); text-align:center; }
+  td:first-child { text-align:left; font-weight:500; }
+  .check-pass { color:var(--green); font-weight:700; }
+  .check-fail { color:var(--red); font-weight:700; }
+  .check-warn { color:var(--yellow); font-weight:700; }
+  .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600; }
+  .tag-red { background:#fdf0f0; color:var(--red); }
+  .tag-yellow { background:#fef9e7; color:var(--yellow); }
+  .tag-green { background:#d4edda; color:var(--green); }
+  .tag-orange { background:#ffe5d0; color:var(--orange); }
+  .case-card { border:1px solid var(--border); border-radius:8px; padding:16px; margin-bottom:12px; }
+  .case-card:hover { box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+  .advice-block { margin-bottom:16px; }
+  .advice-block h4 { margin-bottom:8px; color:#2563eb; }
+  .advice-item { padding:8px 12px; margin:4px 0; background:var(--bg); border-radius:6px;
+    font-size:13px; display:flex; justify-content:space-between; align-items:center; }
+  .advice-item .owner { font-size:11px; color:var(--text-secondary); }
+  .advice-item .deadline { font-size:11px; padding:2px 6px; border-radius:3px; background:#ddd; }
+  .audit-checklist { }
+  .audit-checklist li { padding:6px 0; border-bottom:1px dotted var(--border); font-size:13px; }
+  .cause-path { background:#f0f4ff; border-left:3px solid #2563eb; padding:12px 16px; margin:8px 0;
+    border-radius:0 8px 8px 0; font-size:13px; }
+  .disclaimer { background:#fef9e7; border:1px solid #f0e0a0; border-radius:8px; padding:14px 18px;
+    font-size:12px; color:#856404; margin-top:16px; }
+  .footer { text-align:center; padding:20px; color:var(--text-secondary); font-size:12px; }
+  .toc { list-style:none; columns:2; }
+  .toc li { padding:4px 0; }
+  .toc li a { color:#2563eb; text-decoration:none; font-size:14px; }
+
+  /* ========== 打印样式：所见即所得 ========== */
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+    @page { size: A4; margin: 8mm 8mm; }
+    html, body { background: white !important; padding: 0 !important; margin: 0 !important; width: 100% !important; font-size: 12px !important; }
+    .container { max-width: 100% !important; width: 100% !important; }
+    .card { break-inside: avoid; page-break-inside: avoid; box-shadow: none !important; border: 1px solid var(--border) !important; margin-bottom: 6px !important; padding: 10px 12px !important; }
+    .header { background: #1a1a2e !important; color: #fff !important; -webkit-print-color-adjust: exact !important; padding: 10px 14px !important; }
+    .case-card:hover { box-shadow: none !important; }
+    .check-pass { color: var(--green) !important; }
+    .check-fail { color: var(--red) !important; }
+    .check-warn { color: var(--yellow) !important; }
+    .tag-red { background: #fdf0f0 !important; color: var(--red) !important; }
+    .tag-yellow { background: #fef9e7 !important; color: var(--yellow) !important; }
+    .tag-green { background: #d4edda !important; color: var(--green) !important; }
+    .tag-orange { background: #ffe5d0 !important; color: var(--orange) !important; }
+    .cause-path { background: #f0f4ff !important; border-left-color: #2563eb !important; }
+    .disclaimer { background: #fef9e7 !important; border-color: #f0e0a0 !important; font-size: 10px !important; padding: 6px 8px !important; }
+    .chart-container { height: 280px !important; break-inside: avoid; page-break-inside: avoid; }
+    .advice-item { background: var(--bg) !important; }
+    th { background: var(--bg) !important; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>🔬 财务报表分析报告 — 专家会诊</h1>
+    <div class="meta">{{ company_name | default("未命名企业") }} | {{ report_date }} | 深度诊断模式 · 第三级 | 尽调级分析 | 作者: 优方皑尔 Uform Ai</div>
+  </div>
+
+  <!-- 目录 -->
+  <div class="card">
+    <div class="card-title">📑 报告目录</div>
+    <ul class="toc">
+      <li><a href="#crosscheck">1. 8大类勾稽验证</a></li>
+      <li><a href="#policy">2. 会计政策分析</a></li>
+      <li><a href="#fraudrisk">3. 粉饰风险评估</a></li>
+      <li><a href="#relatedparty">4. 关联交易穿透</a></li>
+      <li><a href="#compliance">5. 合规红线检查</a></li>
+      <li><a href="#attribution">7. 归因分析</a></li>
+      <li><a href="#actionplan">8. 行动方案与实用建议</a></li>
+      <li><a href="#audit">9. 审计程序映射与核查清单</a></li>
+      <li><a href="#charts">10. 专项图表</a></li>
+    </ul>
+  </div>
+
+  <!-- 1. 勾稽验证 -->
+  <div class="card" id="crosscheck">
+    <div class="card-title">🔗 8大类勾稽关系验证</div>
+    <table>
+      <tr><th>类别</th><th>检查项</th><th>状态</th><th>偏差</th><th>说明</th></tr>
+      {% for cat in crosscheck_results %}
+      <tr>
+        <td rowspan="{{ cat.checks | length }}"><strong>{{ cat.name }}</strong></td>
+        {% for check in cat.checks %}
+        {% if not loop.first %}<tr>{% endif %}
+        <td>{{ check.name }}</td>
+        <td><span class="{% if check.status == 'PASS' %}check-pass{% elif check.status == 'WARN' %}check-warn{% else %}check-fail{% endif %}">{{ check.status }}</span></td>
+        <td>{{ check.deviation }}</td>
+        <td style="font-size:12px">{{ check.note }}</td>
+        {% if not loop.last %}</tr>{% endif %}
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </table>
+    <div style="margin-top:12px;padding:12px;background:{{ 'var(--bg)' if master_status == 'PASS' else '#fdf0f0' }};border-radius:8px;font-weight:600;">
+      主检查状态: <span class="{{ 'check-pass' if master_status == 'PASS' else 'check-fail' }}">{{ master_status_text }}</span>
+    </div>
+  </div>
+
+  <!-- 2. 会计政策分析 -->
+  <div class="card" id="policy">
+    <div class="card-title">⚖️ 会计政策选择分析</div>
+    <table>
+      <tr><th>检测项</th><th>企业值</th><th>行业均值</th><th>评级</th><th>对利润影响</th></tr>
+      {% for p in policy_analysis %}
+      <tr>
+        <td>{{ p.item }}</td>
+        <td>{{ p.company_value }}</td>
+        <td>{{ p.industry_avg }}</td>
+        <td><span class="tag {% if p.rating == '激进' %}tag-red{% elif p.rating == '关注' %}tag-yellow{% else %}tag-green{% endif %}">{{ p.rating }}</span></td>
+        <td>{{ p.profit_impact }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <!-- 3. 粉饰风险评估 -->
+  <div class="card" id="fraudrisk">
+    <div class="card-title">🎭 粉饰风险评估</div>
+    <div class="grid-3">
+      <div style="text-align:center;padding:16px">
+        <div style="font-size:36px;font-weight:700;color:{{ 'var(--red)' if fraud_total > 5 else 'var(--yellow)' if fraud_total > 2 else 'var(--green)' }}">{{ fraud_total }}</div>
+        <div style="font-size:12px;color:var(--text-secondary)">触发红灯数</div>
+      </div>
+      <div style="text-align:center;padding:16px">
+        <div style="font-size:36px;font-weight:700;color:{{ 'var(--red)' if anomaly_count > 3 else 'var(--yellow)' if anomaly_count > 1 else 'var(--green)' }}">{{ anomaly_count }}</div>
+        <div style="font-size:12px;color:var(--text-secondary)">科目异常数</div>
+      </div>
+      <div style="text-align:center;padding:16px">
+        <div style="font-size:36px;font-weight:700;color:{{ 'var(--red)' if risk_score > 60 else 'var(--yellow)' if risk_score > 30 else 'var(--green)' }}">{{ risk_score }}</div>
+        <div style="font-size:12px;color:var(--text-secondary)">综合风险评分</div>
+      </div>
+    </div>
+    <div class="chart-container" id="redflag-timeline" style="margin-top:16px"></div>
+  </div>
+
+  <!-- 4. 关联交易穿透 -->
+  <div class="card" id="relatedparty">
+    <div class="card-title">🎯 关联交易6维度穿透</div>
+    <table>
+      <tr><th>监测维度</th><th>检测规则</th><th>当前值</th><th>阈值</th><th>状态</th></tr>
+      {% for dim in related_party %}
+      <tr>
+        <td>{{ dim.dimension }}</td>
+        <td style="font-size:12px">{{ dim.rule }}</td>
+        <td>{{ dim.value }}</td>
+        <td>{{ dim.threshold }}</td>
+        <td><span class="tag {% if dim.triggered %}tag-red{% else %}tag-green{% endif %}">{{ '⚠️ 触发' if dim.triggered else '✅ 正常' }}</span></td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <!-- 6. 合规红线 -->
+  <div class="card" id="compliance">
+    <div class="card-title">🚫 合规红线检查（14条）</div>
+    <table>
+      <tr><th>#</th><th>标准/法规</th><th>检查内容</th><th>状态</th><th>说明</th></tr>
+      {% for cr in compliance_results %}
+      <tr>
+        <td>{{ cr.id }}</td>
+        <td>{{ cr.standard }}</td>
+        <td style="font-size:12px">{{ cr.check }}</td>
+        <td><span class="tag {% if cr.status == '触发' %}tag-red{% elif cr.status == '关注' %}tag-yellow{% else %}tag-green{% endif %}">{{ cr.status }}</span></td>
+        <td style="font-size:12px">{{ cr.note }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <!-- 7. 归因分析 -->
+  <div class="card" id="attribution">
+    <div class="card-title">🧬 归因分析</div>
+    {% for attr in attribution %}
+    <div style="margin-bottom:16px">
+      <h4 style="color:#2563eb;margin-bottom:8px">{{ attr.conclusion }}</h4>
+      <div class="cause-path">{{ attr.cause_path }}</div>
+      <div style="font-size:13px;margin-top:8px">
+        <strong>数据支撑:</strong> {{ attr.evidence }}<br>
+        <strong>关联信号:</strong> {{ attr.linked_signals | join(', ') }}<br>
+        <strong>可能性:</strong> {{ attr.probability }}%
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- 8. 行动方案与建议 -->
+  <div class="card" id="actionplan">
+    <div class="card-title">💡 运营与财务管理实用建议</div>
+    {% for advice in advice_list %}
+    <div class="advice-block">
+      <h4>📌 {{ advice.scenario }}</h4>
+      {% if advice.operations %}
+      <p style="font-weight:600;font-size:13px;color:var(--text-secondary);margin:8px 0">🏭 运营改善</p>
+      {% for item in advice.operations %}
+      <div class="advice-item">
+        <span>• {{ item.action }}</span>
+        <span><span class="owner">{{ item.owner }}</span> <span class="deadline">{{ item.deadline }}</span></span>
+      </div>
+      {% endfor %}
+      {% endif %}
+      {% if advice.finance %}
+      <p style="font-weight:600;font-size:13px;color:var(--text-secondary);margin:8px 0">💰 财务管理</p>
+      {% for item in advice.finance %}
+      <div class="advice-item">
+        <span>• {{ item.action }}</span>
+        <span><span class="owner">{{ item.owner }}</span> <span class="deadline">{{ item.deadline }}</span></span>
+      </div>
+      {% endfor %}
+      {% endif %}
+      {% if advice.strategy %}
+      <p style="font-weight:600;font-size:13px;color:var(--text-secondary);margin:8px 0">🎯 战略调整</p>
+      {% for item in advice.strategy %}
+      <div class="advice-item">
+        <span>• {{ item.action }}</span>
+        <span><span class="owner">{{ item.owner }}</span> <span class="deadline">{{ item.deadline }}</span></span>
+      </div>
+      {% endfor %}
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- 9. 审计程序与核查清单 -->
+  <div class="card" id="audit">
+    <div class="card-title">📋 审计程序映射与核查清单</div>
+    <ol class="audit-checklist">
+      {% for item in audit_items %}
+      <li>
+        <strong>{{ item.procedure }}</strong>
+        <span style="font-size:11px;color:var(--text-secondary)"> — {{ item.triggered_by }}</span>
+        <ul style="margin:4px 0 4px 20px;font-size:12px;color:var(--text-secondary)">
+          {% for step in item.steps %}
+          <li>{{ step }}</li>
+          {% endfor %}
+        </ul>
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+
+  <!-- 10. 专项图表 -->
+  <div class="card" id="charts">
+    <div class="card-title">📉 专项图表</div>
+    <div class="grid-2">
+      <div class="chart-container" id="mscore-trend"></div>
+      <div class="chart-container" id="zscore-heat"></div>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    ⚠️ 免责声明：本报告由AI自动分析生成，基于公开财务数据，仅供内部参考，不构成投资建议、审计意见或法律意见。报告中的"异常""疑似"等表述仅表示财务指标偏离常规水平，不构成对任何违法违规行为的认定。如需正式审计意见，请咨询持牌会计师事务所。
+  </div>
+  <div class="footer">
+    © 2026 优方皑尔 Uform Ai | 财务报表分析专家 v2.6.0 | 本文档为机器自动生成
+  </div>
+</div>
+
+<script>
+(function() {
+  // M-Score趋势
+  var ms = echarts.init(document.getElementById('mscore-trend'));
+  ms.setOption({
+    tooltip: { trigger: 'axis' },
+    xAxis: { type: 'category', data: {{ mscore_periods | tojson }} },
+    yAxis: { type: 'value', name: 'M-Score' },
+    series: [
+      { type: 'line', data: {{ mscore_trend | tojson }}, name: 'M-Score', lineStyle: {color:'#e74c3c'},
+        markLine: { silent: true, data: [{ yAxis: -1.78, lineStyle: {color:'#e74c3c',type:'dashed'},
+          label: {formatter:'嫌疑线 -1.78'} }, { yAxis: -2.22, lineStyle: {color:'#f39c12',type:'dashed'},
+          label: {formatter:'警戒线 -2.22'} }] } }
+    ]
+  });
+
+  // Z-Score热力
+  var zh = echarts.init(document.getElementById('zscore-heat'));
+  zh.setOption({
+    tooltip: { position: 'top' },
+    grid: { top:'10%', left:'20%', right:'5%', bottom:'10%' },
+    xAxis: { type: 'category', data: {{ zscore_periods | tojson }} },
+    yAxis: { type: 'category', data: {{ zscore_accounts | tojson }} },
+    visualMap: { min: -3, max: 3, calculable: true, orient: 'horizontal', left:'center', bottom:'0%',
+      inRange: { color: ['#27ae60','#d4edda','#fff3cd','#ffe5d0','#fadbd8','#e74c3c'] } },
+    series: [{ type: 'heatmap', data: {{ zscore_data | tojson }}, label: { show: true, fontSize: 10 } }]
+  });
+
+  // 红灯信号时间线
+  {% if redflag_timeline %}
+  var rf = echarts.init(document.getElementById('redflag-timeline'));
+  rf.setOption({
+    tooltip: { trigger: 'axis' },
+    legend: { data: ['P0','P1'], bottom: '0%' },
+    xAxis: { type: 'category', data: {{ redflag_periods | tojson }} },
+    yAxis: { type: 'value', name: '触发数' },
+    series: [
+      { type: 'bar', stack: 'total', data: {{ redflag_p0 | tojson }}, name: 'P0',
+        itemStyle: { color: '#e74c3c' } },
+      { type: 'bar', stack: 'total', data: {{ redflag_p1 | tojson }}, name: 'P1',
+        itemStyle: { color: '#f39c12' } }
+    ]
+  });
+  {% endif %}
+})();
+</script>
+</body>
+</html>

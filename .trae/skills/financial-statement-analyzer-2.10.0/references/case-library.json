@@ -1,0 +1,92 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "last_updated": "2026-06-14",
+    "author": "优方皑尔 Uform Ai",
+    "matching_method": "cosine_similarity",
+    "total_cases": 3
+  },
+  "cases": [
+    {
+      "id": "CASE-001",
+      "name": "康美药业 (2016-2018)",
+      "industry": "医药制造业",
+      "fraud_type": "货币资金虚增",
+      "summary": "账面货币资金超300亿但利息收入极低，同时大量举债支付高额利息，形成典型存贷双高特征。后经核查发现虚构货币资金约300亿元。",
+      "features": {
+        "cash_to_total_assets": 0.40,
+        "interest_income_to_cash": 0.003,
+        "interest_bearing_debt_to_total_assets": 0.35,
+        "gross_margin_vs_industry": 1.3,
+        "cfo_to_net_income": 0.45,
+        "receivable_growth_to_revenue_growth": 1.8,
+        "inventory_growth_to_cost_growth": 1.5,
+        "mscore": -1.2,
+        "goodwill_to_equity": 0.02,
+        "rd_capitalization_rate": 0.05
+      },
+      "p0_features": ["cash_to_total_assets", "interest_income_to_cash", "cfo_to_net_income"],
+      "detection_score": "high"
+    },
+    {
+      "id": "CASE-002",
+      "name": "康得新 (2017-2019)",
+      "industry": "化学原料及化学制品制造业",
+      "fraud_type": "货币资金虚构+存款境外",
+      "summary": "账面显示大量货币资金（超80%存放于境外银行），存款收益率远低于举债利率，形成存贷双高悖论。后经核查发现境外存款大部分为虚构。",
+      "features": {
+        "cash_to_total_assets": 0.38,
+        "interest_income_to_cash": 0.005,
+        "interest_bearing_debt_to_total_assets": 0.32,
+        "gross_margin_vs_industry": 1.25,
+        "cfo_to_net_income": 0.40,
+        "receivable_growth_to_revenue_growth": 2.0,
+        "inventory_growth_to_cost_growth": 1.3,
+        "mscore": -1.0,
+        "goodwill_to_equity": 0.05,
+        "rd_capitalization_rate": 0.15
+      },
+      "p0_features": ["cash_to_total_assets", "interest_income_to_cash", "receivable_growth_to_revenue_growth"],
+      "detection_score": "medium_high"
+    },
+    {
+      "id": "CASE-003",
+      "name": "獐子岛 (2013-2015)",
+      "industry": "渔业",
+      "fraud_type": "存货异常+大额计提",
+      "summary": "存货/总资产比例剧烈波动，先后经历大额计提跌价准备后转回，形成存货价值异常循环。存货占总资产比例从30%猛增至55%后又跌回。",
+      "features": {
+        "cash_to_total_assets": 0.08,
+        "interest_income_to_cash": 0.01,
+        "interest_bearing_debt_to_total_assets": 0.28,
+        "gross_margin_vs_industry": 0.7,
+        "cfo_to_net_income": 0.60,
+        "receivable_growth_to_revenue_growth": 0.8,
+        "inventory_growth_to_cost_growth": 3.0,
+        "mscore": -1.45,
+        "goodwill_to_equity": 0.01,
+        "rd_capitalization_rate": 0.01
+      },
+      "p0_features": ["inventory_growth_to_cost_growth", "gross_margin_vs_industry"],
+      "detection_score": "high"
+    }
+  ],
+  "feature_weights": {
+    "cash_to_total_assets": 0.08,
+    "interest_income_to_cash": 0.10,
+    "interest_bearing_debt_to_total_assets": 0.06,
+    "gross_margin_vs_industry": 0.12,
+    "cfo_to_net_income": 0.14,
+    "receivable_growth_to_revenue_growth": 0.12,
+    "inventory_growth_to_cost_growth": 0.12,
+    "mscore": 0.16,
+    "goodwill_to_equity": 0.05,
+    "rd_capitalization_rate": 0.05
+  },
+  "p0_feature_boost": 0.3,
+  "matching_threshold": {
+    "high": 0.70,
+    "medium": 0.50,
+    "low": 0.30
+  }
+}

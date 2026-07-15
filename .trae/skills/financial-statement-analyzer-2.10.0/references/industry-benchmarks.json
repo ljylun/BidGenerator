@@ -1,0 +1,142 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "last_updated": "2026-06-14",
+    "data_source": "Wind/CSMAR 静态快照",
+    "author": "优方皑尔 Uform Ai"
+  },
+  "industries": {
+    "C34_通用设备制造": {
+      "label": "通用设备制造业",
+      "ratios": {
+        "gross_margin": { "p25": 0.18, "p50": 0.25, "p75": 0.35 },
+        "net_margin": { "p25": 0.03, "p50": 0.07, "p75": 0.12 },
+        "roe": { "p25": 0.03, "p50": 0.08, "p75": 0.15 },
+        "current_ratio": { "p25": 1.0, "p50": 1.5, "p75": 2.5 },
+        "quick_ratio": { "p25": 0.6, "p50": 1.0, "p75": 1.8 },
+        "debt_to_asset": { "p25": 0.30, "p50": 0.45, "p75": 0.60 },
+        "asset_turnover": { "p25": 0.40, "p50": 0.65, "p75": 1.00 },
+        "inventory_turnover_days": { "p25": 60, "p50": 90, "p75": 150 },
+        "receivable_turnover_days": { "p25": 30, "p50": 60, "p75": 120 },
+        "ebitda_interest_coverage": { "p25": 2.0, "p50": 5.0, "p75": 12.0 },
+        "cfo_to_net_income": { "p25": 0.6, "p50": 1.0, "p75": 1.5 },
+        "free_cash_flow_margin": { "p25": -0.02, "p50": 0.04, "p75": 0.10 }
+      },
+      "red_flag_adjustments": {
+        "cfo_to_net_income_threshold": 0.5,
+        "inventory_turnover_days_alert": 180
+      }
+    },
+    "C35_专用设备制造": {
+      "label": "专用设备制造业",
+      "ratios": {
+        "gross_margin": { "p25": 0.22, "p50": 0.30, "p75": 0.42 },
+        "net_margin": { "p25": 0.05, "p50": 0.10, "p75": 0.16 },
+        "roe": { "p25": 0.04, "p50": 0.10, "p75": 0.17 },
+        "current_ratio": { "p25": 1.2, "p50": 1.8, "p75": 2.8 },
+        "quick_ratio": { "p25": 0.8, "p50": 1.2, "p75": 2.0 },
+        "debt_to_asset": { "p25": 0.25, "p50": 0.40, "p75": 0.55 },
+        "asset_turnover": { "p25": 0.35, "p50": 0.55, "p75": 0.85 },
+        "inventory_turnover_days": { "p25": 80, "p50": 120, "p75": 200 },
+        "receivable_turnover_days": { "p25": 40, "p50": 80, "p75": 150 },
+        "ebitda_interest_coverage": { "p25": 2.5, "p50": 6.0, "p75": 15.0 },
+        "cfo_to_net_income": { "p25": 0.5, "p50": 0.9, "p75": 1.3 },
+        "free_cash_flow_margin": { "p25": -0.01, "p50": 0.05, "p75": 0.12 }
+      }
+    },
+    "C39_计算机通信电子": {
+      "label": "计算机、通信和其他电子设备制造业",
+      "ratios": {
+        "gross_margin": { "p25": 0.15, "p50": 0.24, "p75": 0.38 },
+        "net_margin": { "p25": 0.02, "p50": 0.06, "p75": 0.13 },
+        "roe": { "p25": 0.03, "p50": 0.09, "p75": 0.16 },
+        "current_ratio": { "p25": 1.1, "p50": 1.6, "p75": 2.6 },
+        "quick_ratio": { "p25": 0.7, "p50": 1.1, "p75": 1.9 },
+        "debt_to_asset": { "p25": 0.28, "p50": 0.42, "p75": 0.58 },
+        "asset_turnover": { "p25": 0.45, "p50": 0.70, "p75": 1.05 },
+        "inventory_turnover_days": { "p25": 45, "p50": 70, "p75": 110 },
+        "receivable_turnover_days": { "p25": 35, "p50": 65, "p75": 110 },
+        "ebitda_interest_coverage": { "p25": 3.0, "p50": 8.0, "p75": 18.0 },
+        "cfo_to_net_income": { "p25": 0.6, "p50": 1.0, "p75": 1.4 },
+        "free_cash_flow_margin": { "p25": -0.03, "p50": 0.03, "p75": 0.09 }
+      },
+      "red_flag_adjustments": {
+        "rd_capitalization_threshold": 0.25,
+        "goodwill_equity_threshold": 0.25
+      }
+    },
+    "F52_零售业": {
+      "label": "零售业",
+      "ratios": {
+        "gross_margin": { "p25": 0.12, "p50": 0.20, "p75": 0.30 },
+        "net_margin": { "p25": 0.01, "p50": 0.03, "p75": 0.06 },
+        "roe": { "p25": 0.04, "p50": 0.09, "p75": 0.16 },
+        "current_ratio": { "p25": 0.9, "p50": 1.3, "p75": 2.0 },
+        "quick_ratio": { "p25": 0.4, "p50": 0.7, "p75": 1.2 },
+        "debt_to_asset": { "p25": 0.35, "p50": 0.55, "p75": 0.70 },
+        "asset_turnover": { "p25": 0.80, "p50": 1.20, "p75": 1.80 },
+        "inventory_turnover_days": { "p25": 30, "p50": 55, "p75": 90 },
+        "receivable_turnover_days": { "p25": 5, "p50": 15, "p75": 35 },
+        "ebitda_interest_coverage": { "p25": 2.0, "p50": 5.0, "p75": 10.0 },
+        "cfo_to_net_income": { "p25": 0.7, "p50": 1.1, "p75": 1.6 },
+        "free_cash_flow_margin": { "p25": 0.0, "p50": 0.04, "p75": 0.09 }
+      }
+    },
+    "K70_房地产业": {
+      "label": "房地产业",
+      "ratios": {
+        "gross_margin": { "p25": 0.20, "p50": 0.28, "p75": 0.38 },
+        "net_margin": { "p25": 0.05, "p50": 0.10, "p75": 0.16 },
+        "roe": { "p25": 0.05, "p50": 0.11, "p75": 0.18 },
+        "current_ratio": { "p25": 1.2, "p50": 1.5, "p75": 2.0 },
+        "quick_ratio": { "p25": 0.3, "p50": 0.5, "p75": 0.8 },
+        "debt_to_asset": { "p25": 0.55, "p50": 0.72, "p75": 0.85 },
+        "asset_turnover": { "p25": 0.15, "p50": 0.25, "p75": 0.35 },
+        "inventory_turnover_days": { "p25": 500, "p50": 800, "p75": 1500 },
+        "receivable_turnover_days": { "p25": 10, "p50": 25, "p75": 50 },
+        "ebitda_interest_coverage": { "p25": 1.5, "p50": 3.0, "p75": 6.0 },
+        "cfo_to_net_income": { "p25": 0.3, "p50": 0.8, "p75": 1.5 },
+        "free_cash_flow_margin": { "p25": -0.10, "p50": 0.0, "p75": 0.05 }
+      },
+      "special_metrics": ["net_debt_ratio", "three_red_lines"]
+    },
+    "I65_软件信息技术": {
+      "label": "软件和信息技术服务业",
+      "ratios": {
+        "gross_margin": { "p25": 0.30, "p50": 0.45, "p75": 0.65 },
+        "net_margin": { "p25": 0.02, "p50": 0.08, "p75": 0.18 },
+        "roe": { "p25": 0.02, "p50": 0.07, "p75": 0.14 },
+        "current_ratio": { "p25": 1.5, "p50": 2.5, "p75": 4.0 },
+        "quick_ratio": { "p25": 1.2, "p50": 2.0, "p75": 3.5 },
+        "debt_to_asset": { "p25": 0.15, "p50": 0.30, "p75": 0.45 },
+        "asset_turnover": { "p25": 0.30, "p50": 0.50, "p75": 0.80 },
+        "inventory_turnover_days": { "p25": 5, "p50": 15, "p75": 40 },
+        "receivable_turnover_days": { "p25": 40, "p50": 80, "p75": 150 },
+        "ebitda_interest_coverage": { "p25": 3.0, "p50": 10.0, "p75": 25.0 },
+        "cfo_to_net_income": { "p25": 0.5, "p50": 0.9, "p75": 1.2 },
+        "free_cash_flow_margin": { "p25": -0.05, "p50": 0.04, "p75": 0.12 }
+      },
+      "red_flag_adjustments": {
+        "rd_capitalization_threshold": 0.20,
+        "receivable_growth_alert": 1.3
+      }
+    },
+    "default": {
+      "label": "通用（默认）",
+      "ratios": {
+        "gross_margin": { "p25": 0.15, "p50": 0.25, "p75": 0.38 },
+        "net_margin": { "p25": 0.03, "p50": 0.08, "p75": 0.14 },
+        "roe": { "p25": 0.03, "p50": 0.09, "p75": 0.16 },
+        "current_ratio": { "p25": 1.0, "p50": 1.6, "p75": 2.5 },
+        "quick_ratio": { "p25": 0.5, "p50": 1.0, "p75": 1.8 },
+        "debt_to_asset": { "p25": 0.28, "p50": 0.45, "p75": 0.62 },
+        "asset_turnover": { "p25": 0.35, "p50": 0.60, "p75": 1.00 },
+        "inventory_turnover_days": { "p25": 40, "p50": 80, "p75": 150 },
+        "receivable_turnover_days": { "p25": 25, "p50": 60, "p75": 110 },
+        "ebitda_interest_coverage": { "p25": 2.0, "p50": 5.0, "p75": 12.0 },
+        "cfo_to_net_income": { "p25": 0.5, "p50": 1.0, "p75": 1.5 },
+        "free_cash_flow_margin": { "p25": -0.02, "p50": 0.04, "p75": 0.10 }
+      }
+    }
+  }
+}

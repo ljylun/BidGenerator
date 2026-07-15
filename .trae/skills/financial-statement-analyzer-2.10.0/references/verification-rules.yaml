@@ -1,0 +1,242 @@
+# ============================================================================
+# 8大类勾稽验证规则
+# ============================================================================
+# 作者: 优方皑尔 Uform Ai
+# 版本: v1.0.0
+# ============================================================================
+
+metadata:
+  version: "1.0.0"
+  total_categories: 8
+  last_updated: "2026-06-14"
+
+categories:
+  # ==========================================================================
+  # 第1类：货币与单位一致性
+  # ==========================================================================
+  - id: "CAT-01"
+    name: "货币与单位一致性"
+    description: "确认所有标签页货币/量级一致"
+    priority: "Fatal"
+    checks:
+      - id: "U-01"
+        name: "货币单位一致性"
+        description: "三表（BS/IS/CF）的货币单位应一致"
+        method: "check_currency_unit_consistency"
+        fields: ["bs.unit", "is.unit", "cf.unit"]
+        tolerance: "exact"
+        fail_action: "auto_convert"
+
+      - id: "U-02"
+        name: "量级检查"
+        description: "同一报表内各科目量级合理"
+        method: "check_magnitude_consistency"
+        fields: ["bs.total_assets", "is.revenue", "cf.operating_cf"]
+        tolerance: "1e6"
+
+  # ==========================================================================
+  # 第2类：资产负债表完整性
+  # ==========================================================================
+  - id: "CAT-02"
+    name: "资产负债表完整性"
+    description: "资产 = 负债 + 所有者权益（每期0偏差）"
+    priority: "Fatal"
+    checks:
+      - id: "BS-01"
+        name: "BS平衡检查"
+        description: "每个期间的资产总计必须等于负债总计加所有者权益总计"
+        method: "check_balance_sheet_equation"
+        formula: "abs(资产总计 - 负债总计 - 所有者权益总计) / 资产总计"
+        tolerance: 0.001
+        fail_action: "block"
+
+      - id: "BS-02"
+        name: "流动资产/非流动资产合计"
+        description: "流动资产+非流动资产=总资产"
+        method: "check_subtotals"
+        formula: "abs(流动资产 + 非流动资产 - 总资产) / 总资产"
+        tolerance: 0.001
+
+      - id: "BS-03"
+        name: "负债/权益合计"
+        description: "流动负债+非流动负债+所有者权益=总资产"
+        method: "check_subtotals"
+        formula: "abs(流动负债 + 非流动负债 + 所有者权益 - 总资产) / 总资产"
+        tolerance: 0.001
+
+  # ==========================================================================
+  # 第3类：现金流量表完整性
+  # ==========================================================================
+  - id: "CAT-03"
+    name: "现金流量表完整性"
+    description: "期末现金=BS现金、CF净利=PL净利、折旧与附表勾稽"
+    priority: "Warning"
+    checks:
+      - id: "CF-01"
+        name: "期末现金与BS勾稽"
+        description: "CF期末现金必须等于BS货币资金"
+        method: "check_cash_tie_out"
+        formula: "abs(CF.期末现金 - BS.货币资金)"
+        tolerance_absolute: 1000
+        tolerance_relative: 0.01
+
+      - id: "CF-02"
+        name: "CF净利润与PL勾稽"
+        description: "CF间接法起始净利润应等于PL净利润"
+        method: "check_net_income_tie_out"
+        formula: "abs(CF.净利润(间接法) - PL.净利润)"
+        tolerance_absolute: 1000
+
+      - id: "CF-03"
+        name: "折旧摊销勾稽"
+        description: "CF补充资料中折旧摊销应与BS附注中勾稽"
+        method: "check_depreciation_tie_out"
+        formula: "abs(CF补充.折旧摊销 - BS附注.折旧摊销)"
+        tolerance: 0.05
+
+      - id: "CF-04"
+        name: "三大现金流合计"
+        description: "经营+投资+筹资+汇率变动=期末-期初"
+        method: "check_cf_total"
+        formula: "abs(经营CFO + 投资CFI + 筹资CFF + 汇率变动 - (期末现金 - 期初现金))"
+        tolerance_absolute: 1000
+
+  # ==========================================================================
+  # 第4类：留存收益滚动
+  # ==========================================================================
+  - id: "CAT-04"
+    name: "留存收益滚动"
+    description: "期初 + 净利 + 股权激励 - 分红 = 期末"
+    priority: "Warning"
+    checks:
+      - id: "RE-01"
+        name: "留存收益滚动验证"
+        description: "期末留存收益 = 期初 + 净利润 - 股利分配 ± 其他综合收益"
+        method: "check_retained_earnings_roll"
+        formula: "abs(期末未分配利润 - (期初 + 净利润 - 股利 - 提取盈余公积)) / max(期末, 1)"
+        tolerance: 0.02
+
+      - id: "RE-02"
+        name: "所有者权益变动勾稽"
+        description: "所有者权益各项变动应与利润表/融资活动勾稽"
+        method: "check_equity_changes"
+        formula: "abs(Δ所有者权益 - (净利润 + Δ资本公积 + Δ其他综合收益)) / max(所有者权益, 1)"
+        tolerance: 0.02
+
+  # ==========================================================================
+  # 第5类：营运资本
+  # ==========================================================================
+  - id: "CAT-05"
+    name: "营运资本勾稽"
+    description: "应收/存货/应付与BS勾稽、DSO/DIO/DPO合理性检查"
+    priority: "Warning"
+    checks:
+      - id: "WC-01"
+        name: "应收账款周转率合理性"
+        description: "DSO应处于合理范围"
+        method: "check_dso_reasonableness"
+        formula: "DSO = 应收账款 / 营业收入 * 365"
+        bounds: [0, 730]
+
+      - id: "WC-02"
+        name: "存货周转率合理性"
+        description: "DIO应处于合理范围"
+        method: "check_dio_reasonableness"
+        formula: "DIO = 存货 / 营业成本 * 365"
+        bounds: [0, 730]
+
+      - id: "WC-03"
+        name: "应付账款周转率合理性"
+        description: "DPO应处于合理范围"
+        method: "check_dpo_reasonableness"
+        formula: "DPO = 应付账款 / 营业成本 * 365"
+        bounds: [0, 730]
+
+      - id: "WC-04"
+        name: "CCC合理性"
+        description: "现金转化周期应合理"
+        method: "check_ccc_reasonableness"
+        formula: "CCC = DSO + DIO - DPO"
+        bounds: [-180, 540]
+
+  # ==========================================================================
+  # 第6类：债务计划表
+  # ==========================================================================
+  - id: "CAT-06"
+    name: "债务计划表勾稽"
+    description: "总债务与BS勾稽、利息与PL勾稽"
+    priority: "Warning"
+    checks:
+      - id: "DB-01"
+        name: "总债务与BS勾稽"
+        description: "各债务科目合计应与BS一致"
+        method: "check_debt_tie_out"
+        formula: "abs(Σ债务科目 - (短期借款 + 长期借款 + 应付债券 + 租赁负债)) / max(总负债, 1)"
+        tolerance: 0.01
+
+      - id: "DB-02"
+        name: "利息费用与PL勾稽"
+        description: "利息费用应在财务费用中合理体现"
+        method: "check_interest_tie_out"
+        formula: "abs(利息费用 - PL.利息费用) / max(abs(利息费用), 1)"
+        tolerance: 0.05
+
+      - id: "DB-03"
+        name: "债务加权平均利率合理性"
+        description: "计算出的加权平均利率应在市场合理范围"
+        method: "check_effective_interest_rate"
+        formula: "利息费用 / 平均有息负债"
+        bounds: [0.01, 0.15]
+
+  # ==========================================================================
+  # 第7类：情景层级
+  # ==========================================================================
+  - id: "CAT-07"
+    name: "情景层级检查"
+    description: "乐观>基准>悲观（利润率/现金流等）"
+    priority: "Info"
+    checks:
+      - id: "SC-01"
+        name: "情景利润率层级"
+        description: "乐观情景的利润率应≥基准≥悲观"
+        method: "check_scenario_hierarchy"
+        fields: ["net_margin_optimistic", "net_margin_base", "net_margin_pessimistic"]
+        expected_order: "descending"
+
+      - id: "SC-02"
+        name: "情景现金流层级"
+        description: "乐观情景的自由现金流应≥基准≥悲观"
+        method: "check_scenario_hierarchy"
+        fields: ["fcf_optimistic", "fcf_base", "fcf_pessimistic"]
+        expected_order: "descending"
+
+      - id: "SC-03"
+        name: "情景BS平衡"
+        description: "所有情景下BS必须平衡"
+        method: "check_scenario_bs_balanced"
+        tolerance: 0.001
+
+  # ==========================================================================
+  # 第8类：公式完整性
+  # ==========================================================================
+  - id: "CAT-08"
+    name: "公式完整性检查"
+    description: "无硬编码、无#REF!、预测列公式一致"
+    priority: "Info"
+    checks:
+      - id: "FM-01"
+        name: "无硬编码数值"
+        description: "报告中不存在未标注来源的硬编码数值"
+        method: "check_no_hardcoded_values"
+        fields: ["所有输出数值"]
+
+      - id: "FM-02"
+        name: "计算公式可追溯"
+        description: "每个输出数值附带计算链"
+        method: "check_calculation_traceable"
+        fields: ["所有计算指标"]
+
+      - id: "FM-03"
+        name: "预测列公式一致性"
+        description: "多期预测列使用相同公式逻辑"
+        method: "check_forecast_formula_consistency"

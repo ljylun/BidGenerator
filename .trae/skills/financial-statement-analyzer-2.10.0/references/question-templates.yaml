@@ -1,0 +1,227 @@
+# ============================================================================
+# 20个预设提问模板
+# ============================================================================
+# 作者: 优方皑尔 Uform Ai
+# 版本: v1.0.0
+# ============================================================================
+
+metadata:
+  version: "1.0.0"
+  total_templates: 20
+  last_updated: "2026-06-14"
+
+templates:
+  - id: "Q01"
+    question: "这家公司的利润质量如何？有没有虚增？"
+    category: "盈利质量"
+    triggers_modules: ["compute_ratios", "scan_redflags", "compute_mscore"]
+    key_indicators:
+      - "扣非净利率/净利率"
+      - "经营CF/净利"
+      - "应收增长率/收入增长率"
+      - "研发资本化率"
+    expected_output: "利润质量评级 + 核心证据 + 建议关注科目"
+
+  - id: "Q02"
+    question: "现金流为什么比净利润差这么多？"
+    category: "现金流分析"
+    triggers_modules: ["compute_ratios", "verify_crosschecks"]
+    key_indicators:
+      - "经营CF/净利趋势"
+      - "应收/存货变动"
+      - "折旧摊销"
+      - "CCC趋势"
+    expected_output: "现金流-净利润差异分解 + 间接法还原 + 原因解释"
+
+  - id: "Q03"
+    question: "有没有关联方资金占用的迹象？"
+    category: "关联交易"
+    triggers_modules: ["scan_redflags"]
+    key_indicators:
+      - "其他应收款/总资产"
+      - "预付款项/总资产"
+      - "关联应收/总应收"
+      - "担保/净资产"
+    expected_output: "关联方资金占用可能性评级 + 证据清单 + 核查建议"
+
+  - id: "Q04"
+    question: "存货高企的原因是什么？有没有跌价风险？"
+    category: "存货分析"
+    triggers_modules: ["compute_ratios", "scan_redflags", "detect_anomalies"]
+    key_indicators:
+      - "存货周转天数趋势"
+      - "存货/总资产"
+      - "存货跌价准备/存货"
+      - "存货增速vs成本增速"
+    expected_output: "存货成因分析 + 跌价风险评估 + 库存处置建议"
+
+  - id: "Q05"
+    question: "公司的偿债能力怎么样？会不会资金链断裂？"
+    category: "偿债能力"
+    triggers_modules: ["compute_ratios", "scan_redflags"]
+    key_indicators:
+      - "流动比率/速动比率/现金比率"
+      - "资产负债率"
+      - "EBITDA利息覆盖"
+      - "短债长投错配检查"
+    expected_output: "偿债能力评分 + 流动性压力评估 + 债务期限结构分析"
+
+  - id: "Q06"
+    question: "毛利率为什么在收入增长时反而下降？"
+    category: "盈利分析"
+    triggers_modules: ["compute_ratios", "detect_anomalies"]
+    key_indicators:
+      - "毛利率趋势"
+      - "收入增长率"
+      - "成本率变动"
+      - "产品结构"
+    expected_output: "毛利率变动归因 + 成本驱动因素 + 行业对比"
+
+  - id: "Q07"
+    question: "商誉有没有减值风险？"
+    category: "商誉分析"
+    triggers_modules: ["scan_redflags", "compute_ratios"]
+    key_indicators:
+      - "商誉/净资产"
+      - "收购标的业绩达标情况"
+      - "商誉减值损失"
+      - "ROIC vs 折现率"
+    expected_output: "商誉减值风险评估 + 减值金额预估 + 敏感性分析"
+
+  - id: "Q08"
+    question: "研发资本化率为什么这么高？对利润影响多大？"
+    category: "研发分析"
+    triggers_modules: ["scan_redflags", "compute_ratios"]
+    key_indicators:
+      - "研发资本化率"
+      - "资本化率同比变动"
+      - "如费用化对利润率的影响"
+      - "同行比较"
+    expected_output: "研发资本化合理性评估 + 费用化还原 + 利润影响测算"
+
+  - id: "Q09"
+    question: "应收账款的坏账准备计提充足吗？"
+    category: "应收账款分析"
+    triggers_modules: ["compute_ratios", "scan_redflags"]
+    key_indicators:
+      - "坏账准备/应收账款"
+      - "账龄结构"
+      - "期后回款率"
+      - "行业对比"
+    expected_output: "坏账充足率评估 + 可能需补提金额 + 政策建议"
+
+  - id: "Q10"
+    question: "这家公司的报表和已知案例有没有相似之处？"
+    category: "案例匹配"
+    triggers_modules: ["match_cases"]
+    key_indicators:
+      - "特征向量"
+      - "余弦相似度"
+    expected_output: "Top-3相似案例 + 相似度% + 共同特征 + 案例警示"
+
+  - id: "Q11"
+    question: "把真实利润还原出来，剔除粉饰因素"
+    category: "利润还原"
+    triggers_modules: ["compute_ratios", "scan_redflags", "detect_anomalies"]
+    key_indicators:
+      - "扣非净利"
+      - "研发资本化还原"
+      - "坏账补提还原"
+      - "折旧补提还原"
+    expected_output: "真实利润还原表 + 粉饰因素逐项分解 + 还原后利润率"
+
+  - id: "Q12"
+    question: "如果是审计师，最应该查哪三个科目？"
+    category: "审计建议"
+    triggers_modules: ["scan_redflags", "verify_crosschecks", "compute_mscore"]
+    key_indicators:
+      - "红灯信号严重度排序"
+      - "M-Score偏离度"
+      - "勾稽偏差排序"
+    expected_output: "Top3关注科目 + 审计程序 + 核查清单"
+
+  - id: "Q13"
+    question: "公司的折旧政策是否过于激进？"
+    category: "会计政策分析"
+    triggers_modules: ["compute_ratios", "detect_anomalies"]
+    key_indicators:
+      - "实际折旧率"
+      - "折旧/固定资产原值"
+      - "行业折旧率对比"
+      - "折旧年限披露"
+    expected_output: "折旧政策评级 + 激进程度 + 对利润影响"
+
+  - id: "Q14"
+    question: "对比同行业，这家公司处在什么水平？"
+    category: "行业对标"
+    triggers_modules: ["compute_ratios"]
+    key_indicators:
+      - "各维度指标分位值"
+      - "与行业中位数对比"
+      - "雷达图对标"
+    expected_output: "行业分位对标表 + 优劣势分析 + 综合排名"
+
+  - id: "Q15"
+    question: "未来两年最可能爆雷的风险点是什么？"
+    category: "风险预警"
+    triggers_modules: ["scan_redflags", "compute_mscore", "detect_anomalies"]
+    key_indicators:
+      - "风险评分趋势"
+      - "红灯信号严重度"
+      - "Z-Score趋势"
+      - "案例匹配"
+    expected_output: "Top3潜在风险点 + 爆雷概率 + 预警指标 + 应对建议"
+
+  - id: "Q16"
+    question: "作为老板最应该关注什么？"
+    category: "管理层视角"
+    triggers_modules: ["generate_advice"]
+    key_indicators:
+      - "综合风险评分"
+      - "关键经营症结"
+      - "现金状况"
+    expected_output: "管理层行动清单 + 十大关注事项 + 近/中/长期建议"
+
+  - id: "Q17"
+    question: "投资人角度怎么看这家公司？"
+    category: "投资人视角"
+    triggers_modules: ["compute_ratios", "compute_mscore", "scan_redflags"]
+    key_indicators:
+      - "M-Score/F-Score"
+      - "ROE/ROA"
+      - "FCF趋势"
+      - "盈利质量"
+    expected_output: "投资价值评估 + 核心风险 + 估值影响因素"
+
+  - id: "Q18"
+    question: "税务方面有什么不合规的地方？"
+    category: "税务分析"
+    triggers_modules: ["scan_redflags", "verify_crosschecks"]
+    key_indicators:
+      - "实际税率"
+      - "应交税费勾稽"
+      - "增值税与收入勾稽"
+      - "关联交易定价"
+    expected_output: "税务风险清单 + 不合规事项 + 补税预估"
+
+  - id: "Q19"
+    question: "应收账款中有多少可能收不回来？"
+    category: "应收账款深度分析"
+    triggers_modules: ["compute_ratios", "scan_redflags", "detect_anomalies"]
+    key_indicators:
+      - "坏账准备/应收"
+      - "逾期应收占比"
+      - "客户集中度"
+      - "期后回款"
+    expected_output: "预计坏账金额 + 高风险客户 + 催收建议"
+
+  - id: "Q20"
+    question: "如果我是监管机构，会关注什么问题？"
+    category: "监管视角"
+    triggers_modules: ["scan_redflags", "verify_crosschecks", "match_cases"]
+    key_indicators:
+      - "合规红线触发"
+      - "关联交易"
+      - "信息披露质量"
+      - "退市风险"
+    expected_output: "监管关注清单 + 违规风险 + 整改建议"

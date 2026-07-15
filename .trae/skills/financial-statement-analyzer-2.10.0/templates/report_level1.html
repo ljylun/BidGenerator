@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财务报表分析报告 — 第一级：急诊初筛</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  :root { --bg: #f5f7fa; --card-bg: #ffffff; --text: #2c3e50; --text-secondary: #7f8c8d;
+    --green: #27ae60; --yellow: #f39c12; --orange: #e67e22; --red: #e74c3c; --skull: #8b0000;
+    --border: #e0e4e8; --radius: 12px; --shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6; padding: 20px; }
+  .container { max-width: 960px; margin: 0 auto; }
+  .header { background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%); color: #fff; padding: 24px 32px;
+    border-radius: var(--radius); margin-bottom: 20px; }
+  .header h1 { font-size: 22px; margin-bottom: 4px; }
+  .header .meta { font-size: 13px; opacity: 0.85; }
+  .card { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 18px 20px; margin-bottom: 10px; border: 1px solid var(--border); }
+  .card-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .health-row { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center; }
+  .health-badge { font-size: 28px; padding: 10px 18px; border-radius: var(--radius); text-align: center; min-width: 100px; line-height: 1.2; }
+  .health-badge.green { background: #d4edda; color: var(--green); }
+  .health-badge.yellow { background: #fff3cd; color: var(--yellow); }
+  .health-badge.orange { background: #ffe5d0; color: var(--orange); }
+  .health-badge.red { background: #fadbd8; color: var(--red); }
+  .health-badge.skull { background: #f0e0e0; color: var(--skull); }
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .stat-item { padding: 8px 10px; background: var(--bg); border-radius: 6px; }
+  .stat-label { font-size: 11px; color: var(--text-secondary); margin-bottom: 2px; }
+  .stat-value { font-size: 18px; font-weight: 700; }
+  .stat-value.danger { color: var(--red); }
+  .stat-value.warning { color: var(--yellow); }
+  .stat-value.ok { color: var(--green); }
+  .risk-list { list-style: none; }
+  .risk-item { padding: 8px 10px; margin-bottom: 5px; border-radius: 6px; border-left: 4px solid; font-size: 13px; }
+  .risk-item.p0 { background: #fdf0f0; border-color: var(--red); }
+  .risk-item.p1 { background: #fef9e7; border-color: var(--yellow); }
+  .risk-item .risk-tag { font-size: 10px; padding: 1px 6px; border-radius: 3px; margin-right: 6px; color: #fff; }
+  .risk-tag.p0 { background: var(--red); }
+  .risk-tag.p1 { background: var(--yellow); color: #333; }
+  .one-liner { font-size: 13px; padding: 12px 14px; background: #eaf2f8; border-radius: 6px; border-left: 4px solid #2980b9; }
+  .actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .btn { padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: 500;
+    transition: opacity 0.2s; }
+  .btn-primary { background: #2563eb; color: #fff; }
+  .btn-outline { background: #fff; color: #2563eb; border: 1px solid #2563eb; }
+  .btn:hover { opacity: 0.85; }
+  .chart-container { width: 100%; height: 280px; }
+  .footer { text-align: center; padding: 10px; color: var(--text-secondary); font-size: 11px; }
+  .disclaimer { background: #fef9e7; border: 1px solid #f0e0a0; border-radius: 6px; padding: 8px 12px;
+    font-size: 11px; color: #856404; margin-top: 10px; }
+  .zscore-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .zscore-table th, .zscore-table td { padding: 5px 8px; text-align: center; border-bottom: 1px solid var(--border); }
+  .zscore-table th { background: var(--bg); font-weight: 600; color: var(--text-secondary); }
+
+  /* ========== 打印样式：所见即所得 ========== */
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+    @page { size: A4; margin: 8mm 8mm; }
+    html, body { background: white !important; padding: 0 !important; margin: 0 !important; width: 100% !important; font-size: 12px !important; }
+    .container { max-width: 100% !important; width: 100% !important; padding: 0 !important; }
+    .card { box-shadow: none !important; border: 1px solid var(--border) !important; padding: 10px 12px !important; margin-bottom: 6px !important; break-inside: avoid; page-break-inside: avoid; }
+    .card-title { font-size: 14px !important; margin-bottom: 6px !important; }
+    .health-badge { font-size: 22px !important; padding: 6px 12px !important; min-width: 80px !important; break-inside: avoid; page-break-inside: avoid; }
+    .stat-item { padding: 5px 8px !important; break-inside: avoid; page-break-inside: avoid; }
+    .stat-label { font-size: 10px !important; }
+    .stat-value { font-size: 15px !important; }
+    .risk-item { padding: 5px 8px !important; margin-bottom: 3px !important; font-size: 11px !important; break-inside: auto; page-break-inside: auto; }
+    .one-liner { font-size: 12px !important; padding: 8px 10px !important; break-inside: avoid; page-break-inside: avoid; }
+    .disclaimer { font-size: 10px !important; padding: 6px 8px !important; break-inside: avoid; page-break-inside: avoid; }
+    .header { background: #1a365d !important; color: #fff !important; -webkit-print-color-adjust: exact !important; padding: 10px 14px !important; }
+    .health-badge.green { background: #d4edda !important; }
+    .health-badge.yellow { background: #fff3cd !important; }
+    .health-badge.orange { background: #ffe5d0 !important; }
+    .health-badge.red { background: #fadbd8 !important; }
+    .health-badge.skull { background: #f0e0e0 !important; }
+    .stat-item { background: var(--bg) !important; }
+    .risk-item.p0 { background: #fdf0f0 !important; }
+    .risk-item.p1 { background: #fef9e7 !important; }
+    .risk-tag.p0 { background: var(--red) !important; }
+    .risk-tag.p1 { background: var(--yellow) !important; }
+    .one-liner { background: #eaf2f8 !important; }
+    .btn { display: none !important; }
+    .chart-container { height: 300px !important; break-inside: avoid; page-break-inside: avoid; }
+    .disclaimer { background: #fef9e7 !important; }
+    .zscore-table th { background: var(--bg) !important; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>📊 财务报表分析报告 — 急诊初筛</h1>
+    <div class="meta">{{ company_name | default("未命名企业") }} | {{ report_date }} | ⚡ 快速诊断模式 | 作者: 优方皑尔 Uform Ai</div>
+    {% if data_sufficiency %}
+    <div style="margin-top:8px;padding:6px 12px;background:rgba(255,255,255,0.15);border-radius:4px;font-size:12px;">{{ data_sufficiency }}</div>
+    {% endif %}
+  </div>
+
+  <!-- 健康度灯号 -->
+  <div class="card">
+    <div class="card-title">🏥 健康度灯号</div>
+    <div class="health-row">
+      <div class="health-badge {{ health_class }}">
+        {{ health_emoji }} {{ health_label }}
+      </div>
+      <div class="stat-grid">
+        <div class="stat-item">
+          <div class="stat-label">综合风险评分</div>
+          <div class="stat-value {{ risk_class }}">{{ risk_score }}/100</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Z-Score</div>
+          <div class="stat-value {{ zscore_class }}">{{ zscore }}</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">M-Score</div>
+          <div class="stat-value {{ mscore_class }}">{{ mscore_display | default(mscore) }}</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">F-Score</div>
+          <div class="stat-value {{ fscore_class }}">{{ fscore }}/9</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 核心指标概览 -->
+  <div class="card">
+    <div class="card-title">📈 核心指标速览</div>
+    <div class="chart-container" id="gauge-chart"></div>
+  </div>
+
+  <!-- Top风险 -->
+  <div class="card">
+    <div class="card-title">🚨 Top 风险信号</div>
+    <ul class="risk-list">
+      {% for risk in top_risks %}
+      <li class="risk-item {{ risk.severity | lower }}">
+        <span class="risk-tag {{ risk.severity | lower }}">{{ risk.severity }}</span>
+        <strong>{{ risk.name }}</strong>
+        <div style="margin-top:4px;font-size:13px;color:var(--text-secondary)">{{ risk.description }}</div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- 现金流模式 -->
+  <div class="card">
+    <div class="card-title">💵 现金流8模式画像</div>
+    <div class="stat-grid">
+      <div class="stat-item">
+        <div class="stat-label">经营CF</div>
+        <div class="stat-value">{{ operating_cf_sign }}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">投资CF</div>
+        <div class="stat-value">{{ investing_cf_sign }}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">筹资CF</div>
+        <div class="stat-value">{{ financing_cf_sign }}</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;font-size:14px">
+      <strong>模式 {{ cf_pattern_id }}</strong>: {{ cf_pattern_name }} — {{ cf_pattern_desc }}
+    </div>
+  </div>
+
+  <!-- 一句话诊断 -->
+  <div class="card">
+    <div class="card-title">💬 核心诊断</div>
+    <div class="one-liner">{{ one_liner }}</div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="window.print()">📥 打印/导出PDF</button>
+      <button class="btn btn-outline" onclick="var u=window.location.href.split('_L1_')[0];window.location.href=u+'_L2_专科门诊.html'">🔬 L2 专科门诊</button>
+      <button class="btn btn-outline" onclick="var u=window.location.href.split('_L1_')[0];window.location.href=u+'_L3_专家会诊.html'">🚨 L3 专家会诊</button>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    ⚠️ 免责声明：本报告由AI自动分析生成，基于公开财务数据，仅供内部参考，不构成投资建议、审计意见或法律意见。报告中的"异常""疑似"等表述仅表示财务指标偏离常规水平，不构成对任何违法违规行为的认定。
+  </div>
+  <div class="footer">© 2026 优方皑尔 Uform Ai | 财务报表分析专家 v2.8.0
+    {% if data_quality %}<span style="margin-left:12px;font-size:10px;color:var(--muted)">数据质量: {{ data_quality.grade }}级 {{ data_quality.stars }}</span>{% endif %}
+  </div>
+</div>
+
+<script>
+(function() {
+  var gaugeChart = echarts.init(document.getElementById('gauge-chart'));
+  gaugeChart.setOption({
+    radar: {
+      center: ['50%', '55%'],
+      radius: '70%',
+      indicator: [
+        { name: '偿债能力', max: 100 },
+        { name: '营运能力', max: 100 },
+        { name: '盈利能力', max: 100 },
+        { name: '现金流质量', max: 100 },
+        { name: '成长能力', max: 100 },
+        { name: '资产质量', max: 100 }
+      ]
+    },
+    series: [{
+      type: 'radar',
+      data: [{ value: {{ radar_values | tojson }}, name: '{{ company_name | default("当前企业") }}',
+        areaStyle: { color: 'rgba(37, 99, 235, 0.15)' },
+        lineStyle: { color: '#2563eb', width: 2 },
+        itemStyle: { color: '#2563eb' }
+      }]
+    }]
+  });
+})();
+</script>
+</body>
+</html>

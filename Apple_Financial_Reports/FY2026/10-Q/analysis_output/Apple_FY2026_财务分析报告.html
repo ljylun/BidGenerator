@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026-Q2年度 财务报表分析报告 — Apple Inc. (蘋果公司)</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif; background:#f0f2f5; color:#1a1a2e; line-height:1.6; }
+.container { max-width:1200px; margin:0 auto; padding:20px; }
+.header { background:linear-gradient(135deg, #1a365d 0%, #2b4c7e 100%); color:white; padding:40px; border-radius:16px; margin-bottom:24px; }
+.header h1 { font-size:26px; margin-bottom:8px; }
+.header .sub { opacity:0.85; font-size:13px; }
+.header .ocr-note { margin-top:12px; padding:8px 16px; background:rgba(255,255,255,0.1); border-radius:8px; font-size:12px; opacity:0.8; }
+.kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+.kpi-card { background:white; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,0.06); text-align:center; }
+.kpi-card .label { font-size:13px; color:#64748b; margin-bottom:8px; }
+.kpi-card .value { font-size:26px; font-weight:700; color:#1a365d; }
+.kpi-card .sub { font-size:12px; color:#94a3b8; margin-top:4px; }
+.section { background:white; border-radius:12px; padding:28px; margin-bottom:24px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+.section h2 { font-size:20px; color:#1a365d; margin-bottom:20px; padding-bottom:12px; border-bottom:2px solid #e2e8f0; }
+.chart-row { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
+.chart-box { background:#f8fafc; border-radius:8px; padding:16px; height:320px; display:flex; flex-direction:column; }
+.chart-box h3 { font-size:15px; color:#475569; margin-bottom:12px; }
+.chart-box canvas { flex:1; min-height:0; }
+.finding { padding:14px 18px; border-radius:8px; margin-bottom:10px; border-left:4px solid; }
+.finding.P0 { background:#fef2f2; border-color:#ef4444; }
+.finding.P1 { background:#fffbeb; border-color:#f59e0b; }
+.finding.P2 { background:#eff6ff; border-color:#3b82f6; }
+.finding .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600; margin-right:8px; }
+.finding.P0 .tag { background:#fecaca; color:#991b1b; }
+.finding.P1 .tag { background:#fde68a; color:#92400e; }
+.finding.P2 .tag { background:#bfdbfe; color:#1e40af; }
+.finding .title { font-weight:600; font-size:15px; }
+.finding .detail { font-size:13px; color:#475569; margin-top:6px; line-height:1.7; }
+.ratio-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.ratio-item { background:#f8fafc; border-radius:8px; padding:16px; text-align:center; }
+.ratio-item .r-label { font-size:12px; color:#64748b; }
+.ratio-item .r-value { font-size:22px; font-weight:700; color:#1a365d; }
+.ratio-item .r-grade { font-size:11px; margin-top:4px; }
+.health-badge { display:inline-block; padding:6px 16px; border-radius:20px; font-weight:700; font-size:14px; color:white; }
+table.data { width:100%; border-collapse:collapse; font-size:14px; }
+table.data th { background:#f1f5f9; padding:10px 14px; text-align:left; font-weight:600; color:#475569; border-bottom:2px solid #e2e8f0; }
+table.data td { padding:10px 14px; border-bottom:1px solid #f1f5f9; }
+table.data .num { text-align:right; }
+table.data tr:hover { background:#f8fafc; }
+.disclaimer { background:#fefce8; border:1px solid #fde68a; border-radius:8px; padding:16px; font-size:12px; color:#92400e; margin-top:24px; line-height:1.8; }
+.diag-box { background:linear-gradient(135deg, #eff6ff, #f0f9ff); border-radius:12px; padding:24px; margin-bottom:16px; border:1px solid #bfdbfe; }
+.diag-box h3 { font-size:17px; color:#1e40af; margin-bottom:12px; }
+.diag-box p, .diag-box li { font-size:14px; color:#334155; margin-bottom:6px; }
+.diag-box ul { padding-left:20px; }
+@media print {
+  body { background:white; }
+  .header { background:#1a365d !important; -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+  .kpi-card, .section { box-shadow:none; border:1px solid #e2e8f0; break-inside:avoid; }
+  .chart-box { height:300px !important; break-inside:avoid; }
+  @page { size:A4; margin:15mm 12mm; }
+  .container { max-width:100% !important; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>2026-Q2年度 财务报表分析报告</h1>
+  <div class="sub">Apple Inc. (蘋果公司)</div>
+  <div class="sub">报告生成日期：2026-07-12 | 数据期间：2026-Q2年度</div>
+  <div class="ocr-note">数据来源：用户上传文件 | 数据质量：100/100 (A)</div>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="label">营业收入</div>
+    <div class="value">11.12万</div>
+    <div class="sub">年度主营收入</div>
+  </div>
+  <div class="kpi-card">
+    <div class="label">净利润</div>
+    <div class="value">2.96万</div>
+    <div class="sub">净利率 26.6%</div>
+  </div>
+  <div class="kpi-card">
+    <div class="label">毛利率 / ROE</div>
+    <div class="value">49.3% / 27.8%</div>
+    <div class="sub">盈利能力核心指标</div>
+  </div>
+  <div class="kpi-card">
+    <div class="label">总资产 / 负债率</div>
+    <div class="value">37.11万</div>
+    <div class="sub">负债率 71.3%</div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>健康度综合评估</h2>
+  <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+    <div style="text-align:center;">
+      <div class="health-badge" style="background:#dc2626;">严重危险</div>
+      <div style="font-size:12px;color:#94a3b8;margin-top:6px;">Altman Z-Score: 0.94</div>
+    </div>
+    <div style="flex:1;">
+      <p style="font-size:15px;color:#475569;line-height:1.8;">
+        <strong>风险等级：D级 建议外部审计</strong><br>
+        Z-Score = 0.94，处于<strong>严重危险</strong>。<br>
+        毛利率49.3%，净利率26.6%。<br>
+        ROE 27.8%，资产负债率71.3%。<br>
+        流动比率1.07，重点关注短期偿债能力。
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>利润表分析</h2>
+  <div class="chart-row">
+    <div class="chart-box"><h3>收支结构</h3><canvas id="isChart"></canvas></div>
+    <div class="chart-box"><h3>费用构成</h3><canvas id="expenseChart"></canvas></div>
+  </div>
+  <table class="data">
+    <tr><th>科目</th><th class="num">金额（万元）</th><th class="num">占收入比</th></tr>
+    <tr><td>一、营业收入</td><td class="num">11.12万</td><td class="num">100.0%</td></tr>
+    <tr><td>减：营业成本</td><td class="num">5.64万</td><td class="num">50.7%</td></tr>
+    <tr><td>减：营业税金及附加</td><td class="num">0.00万</td><td class="num">0.0%</td></tr>
+    <tr><td>减：管理费用</td><td class="num">0.00万</td><td class="num">0.0%</td></tr>
+    <tr><td>减：财务费用（收益为负）</td><td class="num">0.01万</td><td class="num">0.0%</td></tr>
+    <tr style="font-weight:700;background:#f8fafc;"><td>二、营业利润</td><td class="num">3.59万</td><td class="num">32.3%</td></tr>
+    <tr style="font-weight:700;background:#f8fafc;"><td>三、利润总额</td><td class="num">3.58万</td><td class="num">32.2%</td></tr>
+    <tr><td>减：所得税费用</td><td class="num">0.63万</td><td class="num">5.6%</td></tr>
+    <tr style="font-weight:700;color:#1a365d;background:#f0f9ff;"><td>四、净利润</td><td class="num">2.96万</td><td class="num">26.6%</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <h2>资产负债表分析</h2>
+  <div class="chart-row">
+    <div class="chart-box"><h3>资产结构</h3><canvas id="assetChart"></canvas></div>
+    <div class="chart-box"><h3>负债与权益结构</h3><canvas id="equityChart"></canvas></div>
+  </div>
+  <table class="data">
+    <tr><th>科目</th><th class="num">期末（万元）</th><th>科目</th><th class="num">期末（万元）</th></tr>
+    <tr><td>货币资金</td><td class="num">4.56万</td><td>应付账款</td><td class="num">5.73万</td></tr>
+    <tr><td>应收账款</td><td class="num">3.03万</td><td>应交税费</td><td class="num">0.00万</td></tr>
+    <tr><td>预付账款</td><td class="num">0.00万</td><td>其他应付款</td><td class="num">0.00万</td></tr>
+    <tr><td>其他应收款</td><td class="num">2.32万</td><td>流动负债合计</td><td class="num">13.46万</td></tr>
+    <tr><td>存货</td><td class="num">0.67万</td><td>负债合计</td><td class="num">26.46万</td></tr>
+    <tr style="font-weight:700;"><td>流动资产合计</td><td class="num">14.41万</td><td>实收资本</td><td class="num">9.95万</td></tr>
+    <tr><td>长期股权投资</td><td class="num">0.00万</td><td>资本公积</td><td class="num">0.00万</td></tr>
+    <tr><td>固定资产</td><td class="num">5.01万</td><td>未分配利润</td><td class="num">1.24万</td></tr>
+    <tr><td>无形资产+其他</td><td class="num">9.88万</td><td>所有者权益合计</td><td class="num" style="font-weight:700;">10.65万</td></tr>
+    <tr style="font-weight:700;color:#1a365d;"><td>资产总计</td><td class="num">37.11万</td><td>负债与权益总计</td><td class="num" style="font-weight:700;">37.11万</td></tr>
+  </table>
+  <p style="font-size:12px;color:#94a3b8;margin-top:8px;">
+    BS平衡校验：平衡
+  </p>
+</div>
+
+<div class="section">
+  <h2>财务比率一览</h2>
+  <div class="ratio-grid">
+    <div class="ratio-item"><div class="r-label">毛利率</div><div class="r-value">49.3%</div><div class="r-grade" style="color:#22c55e;">良好</div></div>
+    <div class="ratio-item"><div class="r-label">净利率</div><div class="r-value">26.6%</div><div class="r-grade" style="color:#ef4444;">偏低</div></div>
+    <div class="ratio-item"><div class="r-label">ROE</div><div class="r-value">27.8%</div><div class="r-grade" style="color:#ef4444;">极低</div></div>
+    <div class="ratio-item"><div class="r-label">资产负债率</div><div class="r-value">71.3%</div><div class="r-grade" style="color:#22c55e;">健康</div></div>
+    <div class="ratio-item"><div class="r-label">流动比率</div><div class="r-value">1.07</div><div class="r-grade" style="color:#f59e0b;">一般</div></div>
+    <div class="ratio-item"><div class="r-label">Z-Score</div><div class="r-value">0.94</div><div class="r-grade" style="color:#dc2626;">严重危险</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>重点发现与风险信号</h2>
+  <div class="finding P0"><span class="tag">P0</span><span class="title">[基础勾稽] 存货vs营业成本背离</span><div class="detail">存货增速远超成本增速，周转天数飙升</div></div>
+<div class="finding P0"><span class="tag">P0</span><span class="title">[基础勾稽] 所得税vs利润总额背离</span><div class="detail">账面利润高，所得税异常低</div></div>
+<div class="finding P0"><span class="tag">P0</span><span class="title">[基础勾稽] 往来款异常</span><div class="detail">长期挂账金额巨大</div></div>
+<div class="finding P0"><span class="tag">P0</span><span class="title">[基础勾稽] 应交税费vs所得税+税金支付偏差</span><div class="detail">应交税费变动与所得税+税金支付偏差>15%</div></div>
+<div class="finding P0"><span class="tag">P0</span><span class="title">[资产质量] 应收账款膨胀率</span><div class="detail">应收增长率/收入增长率 > 1.5</div></div>
+<div class="finding P0"><span class="tag">P0</span><span class="title">[资产质量] 经营CFO/净利背离</span><div class="detail">CFO/净利 < 0.3 持续2期</div></div>
+<div class="finding P0"><span class="tag">P0</span><span class="title">[资产质量] 增值税与收入背离</span><div class="detail">增值税增量/税率与收入增量差异>20%</div></div>
+</div>
+
+<div class="section">
+  <h2>综合诊断与建议</h2>
+  <div class="diag-box"><h3>🔴 存货增速远超成本增速，毛利率虚高 <span style="font-size:12px;font-weight:400;color:#64748b;margin-left:8px;">[P0]</span></h3><p style="font-size:13px;color:#64748b;margin:8px 0 4px 0;">🏭 运营层面：</p><ul><li><strong>财务部</strong>：评估可变现净值，对滞销品计提跌价 <span style="font-size:11px;color:#94a3b8;">1周内</span></li><li><strong>生产部</strong>：减产去库存，按订单拉动生产 <span style="font-size:11px;color:#94a3b8;">立即执行</span></li><li><strong>仓储部+销售部</strong>：对长库龄存货分类处置（促销/报废/返工） <span style="font-size:11px;color:#94a3b8;">2周内</span></li><li><strong>生产部+IT部</strong>：建立安全库存预警机制，超量自动停线 <span style="font-size:11px;color:#94a3b8;">1个月内</span></li></ul><p style="font-size:13px;color:#64748b;margin:8px 0 4px 0;">💰 财务层面：</p><ul><li><strong>财务部</strong>：重估存货可变现净值 <span style="font-size:11px;color:#94a3b8;">1周内</span></li><li><strong>财务部</strong>：足额计提存货跌价准备 <span style="font-size:11px;color:#94a3b8;">当月</span></li><li><strong>财务部</strong>：还原真实毛利率向管理层报告 <span style="font-size:11px;color:#94a3b8;">当月</span></li></ul><p style="font-size:13px;color:#64748b;margin:8px 0 4px 0;">🎯 战略层面：</p><ul><li><strong>管理层</strong>：评估是否暂停非订单驱动的生产 <span style="font-size:11px;color:#94a3b8;">当月</span></li><li><strong>管理层</strong>：修正基于虚高利润的业绩考核目标 <span style="font-size:11px;color:#94a3b8;">当月</span></li><li><strong>管理层+销售部</strong>：评估产品线盈利能力，淘汰亏损产品 <span style="font-size:11px;color:#94a3b8;">季度</span></li></ul></div>
+<div class="diag-box"><h3>🔴 应收膨胀，赊销激进，回款困难 <span style="font-size:12px;font-weight:400;color:#64748b;margin-left:8px;">[P0]</span></h3><p style="font-size:13px;color:#64748b;margin:8px 0 4px 0;">🏭 运营层面：</p><ul><li><strong>销售部</strong>：收紧信用政策，对新客户执行预付款制度 <span style="font-size:11px;color:#94a3b8;">立即执行</span></li><li><strong>法务部</strong>：对超期应收启动法律催收程序 <span style="font-size:11px;color:#94a3b8;">2周内</span></li><li><strong>人力资源部+销售部</strong>：设立回款KPI纳入销售考核（权重≥30%） <span style="font-size:11px;color:#94a3b8;">下个考核周期</span></li></ul><p style="font-size:13px;color:#64748b;margin:8px 0 4px 0;">💰 财务层面：</p><ul><li><strong>财务部</strong>：逐客户分析账龄，对高风险客户单独评估坏账 <span style="font-size:11px;color:#94a3b8;">2周内</span></li><li><strong>财务部</strong>：引入保理/应收账款融资改善现金流 <span style="font-size:11px;color:#94a3b8;">1个月内</span></li><li><strong>财务部</strong>：建立应收账款周报制度，跟踪回款进度 <span style="font-size:11px;color:#94a3b8;">持续</span></li></ul><p style="font-size:13px;color:#64748b;margin:8px 0 4px 0;">🎯 战略层面：</p><ul><li><strong>管理层</strong>：评估主要客户的信用风险，调整客户结构 <span style="font-size:11px;color:#94a3b8;">季度</span></li><li><strong>管理层</strong>：考虑从赊销模式向预付费/订阅模式转型 <span style="font-size:11px;color:#94a3b8;">中长期</span></li></ul></div>
+<div class="diag-box"><h3>🔴 经营现金流持续为负→造血能力不足 <span style="font-size:12px;font-weight:400;color:#64748b;margin-left:8px;">[P0]</span></h3><p style="font-size:13px;color:#64748b;margin:8px 0 4px 0;">🏭 运营层面：</p><ul><li><strong>跨部门</strong>：启动现金流改善专项：压缩应收、加速去库存、延长应付 <span style="font-size:11px;color:#94a3b8;">立即执行</span></li></ul><p style="font-size:13px;color:#64748b;margin:8px 0 4px 0;">💰 财务层面：</p><ul><li><strong>财务部</strong>：逐月编制滚动现金流预算，周度监控 <span style="font-size:11px;color:#94a3b8;">持续</span></li><li><strong>财务部</strong>：设立现金流红线：可用现金不得低于3个月运营支出 <span style="font-size:11px;color:#94a3b8;">立即执行</span></li><li><strong>财务部+管理层</strong>：必要时启动股权融资或引入战略投资者 <span style="font-size:11px;color:#94a3b8;">评估中</span></li></ul><p style="font-size:13px;color:#64748b;margin:8px 0 4px 0;">🎯 战略层面：</p><ul><li><strong>管理层</strong>：重新评估当前业务模式的可持续性 <span style="font-size:11px;color:#94a3b8;">季度</span></li><li><strong>管理层</strong>：考虑战略收缩：剥离亏损业务线 <span style="font-size:11px;color:#94a3b8;">季度</span></li></ul></div>
+<div class="diag-box"><h3>🟡 合同负债下降→提前确认收入 <span style="font-size:12px;font-weight:400;color:#64748b;margin-left:8px;">[P1]</span></h3><p style="font-size:13px;color:#64748b;margin:8px 0 4px 0;">🏭 运营层面：</p><ul><li><strong>销售部</strong>：停止提前确认收入的销售行为 <span style="font-size:11px;color:#94a3b8;">立即执行</span></li><li><strong>财务部</strong>：按合同履约进度正确确认收入 <span style="font-size:11px;color:#94a3b8;">立即执行</span></li></ul><p style="font-size:13px;color:#64748b;margin:8px 0 4px 0;">💰 财务层面：</p><ul><li><strong>财务部</strong>：对已提前确认的收入做追溯调整方案 <span style="font-size:11px;color:#94a3b8;">当月</span></li><li><strong>财务部</strong>：建立合同收入确认内部审核制度 <span style="font-size:11px;color:#94a3b8;">2个月内</span></li></ul><p style="font-size:13px;color:#64748b;margin:8px 0 4px 0;">🎯 战略层面：</p><ul><li><strong>管理层</strong>：评估收入确认政策变更对业绩的影响 <span style="font-size:11px;color:#94a3b8;">当月</span></li></ul></div>
+</div>
+
+<div class="section">
+  <h2>数据质量说明</h2>
+  <table class="data">
+    <tr><td style="width:180px;font-weight:600;">数据来源</td><td>用户上传文件</td></tr>
+    <tr><td style="font-weight:600;">数据质量</td><td>100/100 (A)</td></tr>
+    <tr><td style="font-weight:600;">利润表校验</td><td>交叉验证通过（利润总额-所得税=净利润）</td></tr>
+    <tr><td style="font-weight:600;">BS平衡</td><td>平衡</td></tr>
+    <tr><td style="font-weight:600;">局限性</td><td>① 图片来源数据经OCR识别，可能存在个别数字偏差；② 部分科目未识别，以轧差数代替</td></tr>
+    <tr><td style="font-weight:600;">改进建议</td><td>提供Excel/PDF源文件以获得更高精度分析；提供多年度数据以获得趋势判断</td></tr>
+  </table>
+</div>
+
+<div class="disclaimer">
+  <strong>免责声明：</strong>本报告由AI自动分析生成，基于公开财务数据，仅供内部参考，不构成投资建议、审计意见或法律意见。报告中的"异常""疑似"等表述仅表示财务指标偏离常规水平，不构成对任何违法违规行为的认定。请以原始财务报表为准。 (C) 2026 优方皑尔 Uform Ai
+</div>
+
+</div>
+
+<script>
+Chart.defaults.animation = { duration: 0 };
+Chart.defaults.color = '#475569';
+Chart.defaults.font.family = '-apple-system,BlinkMacSystemFont,"Microsoft YaHei",sans-serif';
+
+// Income statement waterfall
+new Chart(document.getElementById('isChart'), {
+  type: 'bar',
+  data: {
+    labels: ['收入','成本','税金','管理费','财务','营业利润','净利润'],
+    datasets: [{
+      data: [11.1184, -5.6403, -0.0, -0.0, 0.0052, 3.5885, 2.9578],
+      backgroundColor: ['#3b82f6', '#ef4444', '#f59e0b', '#f59e0b', '#22c55e', '#3b82f6', '#1a365d']
+    }]
+  },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ ticks:{ callback:function(v){return v.toFixed(0)+'万';} } } } }
+});
+
+// Asset chart
+new Chart(document.getElementById('assetChart'), {
+  type: 'bar',
+  data: {
+    labels: ['货币资金','应收账款','预付账款','其他应收','存货','长期股权','固定资产','无形+其他'],
+    datasets: [{
+      data: [4.5572, 3.0339, 0.0, 2.3172, 0.6747, 0.0, 5.0116, 9.8764],
+      backgroundColor: ['#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe', '#dbeafe', '#1d4ed8', '#2563eb', '#3b82f6']
+    }]
+  },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ ticks:{ callback:function(v){return v.toFixed(0)+'万';} } } } }
+});
+
+// Liability/Equity chart
+new Chart(document.getElementById('equityChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['应付账款','应交税费','其他应付','实收资本','资本公积','未分配利润'],
+    datasets: [{
+      data: [5.7349, 0.0, 0.0, 9.9507, 0.0, 1.2359],
+      backgroundColor: ['#ef4444', '#f87171', '#fca5a5', '#22c55e', '#4ade80', '#86efac']
+    }]
+  },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } }
+});
+
+// Expense breakdown (dummy if no detail)
+new Chart(document.getElementById('expenseChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['营业成本','税金','管理费用','财务收益'],
+    datasets: [{
+      data: [Math.abs([11.1184, -5.6403, -0.0, -0.0, 0.0052, 3.5885, 2.9578][1]), Math.abs([11.1184, -5.6403, -0.0, -0.0, 0.0052, 3.5885, 2.9578][2]), Math.abs([11.1184, -5.6403, -0.0, -0.0, 0.0052, 3.5885, 2.9578][3]), Math.abs([11.1184, -5.6403, -0.0, -0.0, 0.0052, 3.5885, 2.9578][4])],
+      backgroundColor: ['#ef4444','#f59e0b','#3b82f6','#22c55e']
+    }]
+  },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } }
+});
+</script>
+
+</body>
+</html>

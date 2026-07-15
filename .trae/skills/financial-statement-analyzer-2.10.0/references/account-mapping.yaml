@@ -1,0 +1,747 @@
+# ============================================================================
+# 三级科目映射字典 (CAS 2019 中国企业会计准则)
+# ============================================================================
+# 架构:
+#   Level 3: 企业原始科目（别名引擎匹配） → 通过正则+fuzzywuzzy匹配
+#   Level 2: 标准科目（CAS 2019 标准科目表，核心分析单元）
+#   Level 1: 财报项目（三表行项目，用户可读的聚合层）
+#
+# 作者: 优方皑尔 Uform Ai
+# 版本: v1.0.0
+# ============================================================================
+
+metadata:
+  version: "1.0.0"
+  accounting_standard: "CAS 2019"
+  last_updated: "2026-06-14"
+  total_accounts: 58
+  supported_standards:
+    - "CAS 2019 (新收入准则)"
+    - "CAS 2019 (新租赁准则)"
+    - "CAS 2019 (新金融工具准则)"
+    - "CAS 2006 (旧准则兼容)"
+
+# ============================================================================
+# 资产负债表 (Balance Sheet) 科目映射
+# ============================================================================
+balance_sheet:
+  # --- 资产类 ---
+  货币资金:
+    level2_codes: ["1001", "1002", "1003"]
+    aliases:
+      - "现金及银行存款"
+      - "存放央行款项"
+      - "库存现金"
+      - "银行存款"
+      - "其他货币资金"
+      - "现金及现金等价物"
+    category: "current_asset"
+    sign: "debit"
+
+  交易性金融资产:
+    level2_codes: ["1101"]
+    aliases:
+      - "以公允价值计量且其变动计入当期损益的金融资产"
+      - "短期投资"
+      - "交易性权益工具"
+    category: "current_asset"
+    sign: "debit"
+
+  应收票据:
+    level2_codes: ["1121"]
+    aliases:
+      - "银行承兑汇票"
+      - "商业承兑汇票"
+      - "应收票据及应收账款"
+    category: "current_asset"
+    sign: "debit"
+
+  应收账款:
+    level2_codes: ["1122"]
+    aliases:
+      - "应收销货款"
+      - "应收工程款"
+      - "应收保费"
+      - "应收账款净额"
+      - "应收账款原值"
+    category: "current_asset"
+    sign: "debit"
+
+  预付款项:
+    level2_codes: ["1123"]
+    aliases:
+      - "预付账款"
+      - "预付工程款"
+      - "预付设备款"
+    category: "current_asset"
+    sign: "debit"
+
+  其他应收款:
+    level2_codes: ["1221"]
+    aliases:
+      - "其他应收及暂付款"
+      - "保证金"
+      - "备用金"
+      - "往来款"
+    category: "current_asset"
+    sign: "debit"
+
+  存货:
+    level2_codes: ["1403", "1404", "1405", "1406", "1407", "1408"]
+    aliases:
+      - "原材料"
+      - "在产品"
+      - "库存商品"
+      - "发出商品"
+      - "开发成本"
+      - "开发产品"
+      - "合同履约成本"
+      - "周转材料"
+    category: "current_asset"
+    sign: "debit"
+
+  一年内到期的非流动资产:
+    level2_codes: ["1501"]
+    aliases:
+      - "一年内到期的长期应收款"
+      - "一年内到期非流动资产"
+    category: "current_asset"
+    sign: "debit"
+
+  其他流动资产:
+    level2_codes: ["1599"]
+    aliases:
+      - "待抵扣进项税额"
+      - "预缴所得税"
+      - "委托贷款"
+    category: "current_asset"
+    sign: "debit"
+
+  长期应收款:
+    level2_codes: ["1531"]
+    aliases:
+      - "长期应收款净额"
+      - "融资租赁应收款"
+    category: "non_current_asset"
+    sign: "debit"
+
+  长期股权投资:
+    level2_codes: ["1511"]
+    aliases:
+      - "对联营企业投资"
+      - "对合营企业投资"
+      - "长期股权"
+    category: "non_current_asset"
+    sign: "debit"
+
+  投资性房地产:
+    level2_codes: ["1521"]
+    aliases:
+      - "投资性物业"
+    category: "non_current_asset"
+    sign: "debit"
+
+  固定资产:
+    level2_codes: ["1601"]
+    aliases:
+      - "固定资产原值"
+      - "固定资产原价"
+      - "房屋及建筑物"
+      - "机器设备"
+      - "运输设备"
+      - "电子设备"
+    category: "non_current_asset"
+    sign: "debit"
+
+  累计折旧:
+    level2_codes: ["1602"]
+    aliases:
+      - "固定资产折旧"
+      - "累计折旧及摊销"
+    category: "non_current_asset"
+    sign: "credit"
+
+  固定资产净额:
+    level2_codes: ["1601", "1602"]
+    computation: "固定资产 - 累计折旧"
+    aliases:
+      - "固定资产净值"
+      - "固定资产账面价值"
+    category: "non_current_asset"
+    sign: "debit"
+
+  在建工程:
+    level2_codes: ["1604"]
+    aliases:
+      - "在建工程净额"
+    category: "non_current_asset"
+    sign: "debit"
+
+  使用权资产:
+    level2_codes: ["1621"]
+    aliases:
+      - "租赁资产"
+      - "融资租赁资产"
+      - "使用权资产净额"
+    category: "non_current_asset"
+    sign: "debit"
+    standard_note: "新租赁准则 (CAS 21 2018) 新增科目"
+
+  无形资产:
+    level2_codes: ["1701"]
+    aliases:
+      - "无形资产净额"
+      - "软件"
+      - "专利权"
+      - "商标权"
+    category: "non_current_asset"
+    sign: "debit"
+
+  开发支出:
+    level2_codes: ["1702"]
+    aliases:
+      - "研发支出"
+    category: "non_current_asset"
+    sign: "debit"
+
+  商誉:
+    level2_codes: ["1711"]
+    aliases:
+      - "商誉净额"
+      - "合并价差"
+    category: "non_current_asset"
+    sign: "debit"
+
+  长期待摊费用:
+    level2_codes: ["1801"]
+    aliases:
+      - "长期待摊"
+    category: "non_current_asset"
+    sign: "debit"
+
+  递延所得税资产:
+    level2_codes: ["1811"]
+    aliases:
+      - "递延税资产"
+      - "DTA"
+    category: "non_current_asset"
+    sign: "debit"
+
+  其他非流动资产:
+    level2_codes: ["1999"]
+    aliases:
+      - "预付工程设备款"
+    category: "non_current_asset"
+    sign: "debit"
+
+  # --- 负债类 ---
+  短期借款:
+    level2_codes: ["2001"]
+    aliases:
+      - "短期贷款"
+      - "流动资金借款"
+      - "信用借款"
+    category: "current_liability"
+    sign: "credit"
+
+  应付票据:
+    level2_codes: ["2201"]
+    aliases:
+      - "应付票据及应付账款"
+    category: "current_liability"
+    sign: "credit"
+
+  应付账款:
+    level2_codes: ["2202"]
+    aliases:
+      - "应付材料款"
+      - "应付工程款"
+      - "应付货款"
+    category: "current_liability"
+    sign: "credit"
+
+  合同负债:
+    level2_codes: ["2205"]
+    aliases:
+      - "预收账款"
+      - "预收款项"
+      - "预收工程款"
+    category: "current_liability"
+    sign: "credit"
+    standard_note: "新收入准则 (CAS 14 2017) 替代预收账款"
+
+  应付职工薪酬:
+    level2_codes: ["2211"]
+    aliases:
+      - "应付工资"
+      - "应付福利费"
+      - "应交社保"
+    category: "current_liability"
+    sign: "credit"
+
+  应交税费:
+    level2_codes: ["2221"]
+    aliases:
+      - "应交税金"
+      - "应交所得税"
+      - "应交增值税"
+    category: "current_liability"
+    sign: "credit"
+
+  其他应付款:
+    level2_codes: ["2241"]
+    aliases:
+      - "其他应付款及预提费用"
+      - "暂收款"
+      - "往来款"
+    category: "current_liability"
+    sign: "credit"
+
+  一年内到期的非流动负债:
+    level2_codes: ["2501"]
+    aliases:
+      - "一年内到期长期借款"
+      - "一年内到期长期应付款"
+    category: "current_liability"
+    sign: "credit"
+
+  其他流动负债:
+    level2_codes: ["2299"]
+    aliases:
+      - "待转销项税额"
+    category: "current_liability"
+    sign: "credit"
+
+  长期借款:
+    level2_codes: ["2502"]
+    aliases:
+      - "长期贷款"
+      - "长期信用借款"
+      - "长期抵押借款"
+    category: "non_current_liability"
+    sign: "credit"
+
+  应付债券:
+    level2_codes: ["2503"]
+    aliases:
+      - "可转换债券"
+      - "公司债券"
+    category: "non_current_liability"
+    sign: "credit"
+
+  租赁负债:
+    level2_codes: ["2701"]
+    aliases:
+      - "长期租赁负债"
+      - "融资租赁负债"
+    category: "non_current_liability"
+    sign: "credit"
+    standard_note: "新租赁准则 (CAS 21 2018) 新增科目"
+
+  长期应付款:
+    level2_codes: ["2702"]
+    aliases:
+      - "长期应付款净额"
+    category: "non_current_liability"
+    sign: "credit"
+
+  预计负债:
+    level2_codes: ["2801"]
+    aliases:
+      - "预计担保损失"
+      - "预计诉讼损失"
+      - "预计重组费用"
+    category: "non_current_liability"
+    sign: "credit"
+
+  递延所得税负债:
+    level2_codes: ["2901"]
+    aliases:
+      - "递延税负债"
+      - "DTL"
+    category: "non_current_liability"
+    sign: "credit"
+
+  # --- 所有者权益 ---
+  实收资本:
+    level2_codes: ["3001"]
+    aliases:
+      - "注册资本"
+      - "股本"
+    category: "equity"
+    sign: "credit"
+
+  资本公积:
+    level2_codes: ["3002"]
+    aliases:
+      - "资本溢价"
+      - "股本溢价"
+    category: "equity"
+    sign: "credit"
+
+  盈余公积:
+    level2_codes: ["3101"]
+    aliases:
+      - "法定盈余公积"
+      - "任意盈余公积"
+    category: "equity"
+    sign: "credit"
+
+  未分配利润:
+    level2_codes: ["4104"]
+    aliases:
+      - "留存收益"
+      - "累计未分配利润"
+    category: "equity"
+    sign: "credit"
+
+  少数股东权益:
+    level2_codes: ["3201"]
+    aliases:
+      - "非控制性权益"
+      - "少数股权"
+    category: "equity"
+    sign: "credit"
+
+# ============================================================================
+# 利润表 (Income Statement) 科目映射
+# ============================================================================
+income_statement:
+  营业收入:
+    level2_codes: ["6001", "6051"]
+    aliases:
+      - "销售收入"
+      - "服务收入"
+      - "主营业务收入"
+      - "工程结算收入"
+      - "营业总收入"
+    sign: "credit"
+
+  营业成本:
+    level2_codes: ["6401", "6402"]
+    aliases:
+      - "销售成本"
+      - "服务成本"
+      - "主营业务成本"
+      - "工程结算成本"
+      - "营业总成本"
+    sign: "debit"
+
+  税金及附加:
+    level2_codes: ["6403"]
+    aliases:
+      - "营业税金及附加"
+      - "主营业务税金及附加"
+    sign: "debit"
+
+  销售费用:
+    level2_codes: ["6601"]
+    aliases:
+      - "营业费用"
+      - "营销费用"
+      - "销售及市场费用"
+    sign: "debit"
+
+  管理费用:
+    level2_codes: ["6602"]
+    aliases:
+      - "行政费用"
+      - "一般及行政费用"
+    sign: "debit"
+
+  研发费用:
+    level2_codes: ["6604"]
+    aliases:
+      - "研发支出"
+      - "研究与开发费用"
+      - "技术开发费"
+    sign: "debit"
+    standard_note: "新准则独立列示，旧准则可能在管理费用中"
+
+  财务费用:
+    level2_codes: ["6603"]
+    aliases:
+      - "利息费用"
+      - "汇兑损益"
+      - "银行手续费"
+      - "利息收入"
+    sign: "debit"
+    note: "利息收入用负值表示"
+
+  其他收益:
+    level2_codes: ["6117"]
+    aliases:
+      - "政府补助"
+      - "增值税加计抵减"
+      - "递延收益摊销"
+    sign: "credit"
+
+  投资收益:
+    level2_codes: ["6111"]
+    aliases:
+      - "对联营企业投资收益"
+      - "处置子公司收益"
+      - "理财收益"
+    sign: "credit"
+
+  信用减值损失:
+    level2_codes: ["6702"]
+    aliases:
+      - "坏账损失"
+      - "应收款项减值损失"
+      - "资产减值损失-应收"
+    sign: "debit"
+    standard_note: "新金融工具准则 (CAS 22 2017) 替代坏账损失"
+
+  资产减值损失:
+    level2_codes: ["6701"]
+    aliases:
+      - "存货跌价损失"
+      - "固定资产减值损失"
+      - "商誉减值损失"
+    sign: "debit"
+
+  营业利润:
+    level2_codes: []
+    computation: "营业收入 - 营业成本 - 税金及附加 - 销售费用 - 管理费用 - 研发费用 - 财务费用 + 其他收益 + 投资收益 - 信用减值损失 - 资产减值损失"
+    sign: "credit"
+
+  营业外收入:
+    level2_codes: ["6301"]
+    aliases:
+      - "非流动资产处置利得"
+      - "罚款收入"
+      - "捐赠利得"
+    sign: "credit"
+
+  营业外支出:
+    level2_codes: ["6711"]
+    aliases:
+      - "非流动资产处置损失"
+      - "罚款支出"
+      - "捐赠支出"
+    sign: "debit"
+
+  利润总额:
+    level2_codes: []
+    computation: "营业利润 + 营业外收入 - 营业外支出"
+    sign: "credit"
+
+  所得税费用:
+    level2_codes: ["6801"]
+    aliases:
+      - "所得税"
+      - "当期所得税"
+      - "递延所得税"
+    sign: "debit"
+
+  净利润:
+    level2_codes: []
+    computation: "利润总额 - 所得税费用"
+    sign: "credit"
+
+  归母净利润:
+    level2_codes: []
+    computation: "净利润 - 少数股东损益"
+    aliases:
+      - "归属于母公司股东的净利润"
+    sign: "credit"
+
+# ============================================================================
+# 现金流量表 (Cash Flow Statement) 科目映射
+# ============================================================================
+cash_flow:
+  销售商品提供劳务收到的现金:
+    level2_codes: []
+    aliases:
+      - "销售商品收到的现金"
+      - "销售商品、提供劳务收到的现金"
+    category: "operating"
+
+  经营活动现金流入小计:
+    level2_codes: []
+    aliases:
+      - "经营活动现金流入"
+    category: "operating"
+
+  购买商品接受劳务支付的现金:
+    level2_codes: []
+    aliases:
+      - "购买商品支付的现金"
+    category: "operating"
+
+  支付给职工以及为职工支付的现金:
+    level2_codes: []
+    aliases:
+      - "支付职工薪酬"
+      - "员工薪酬支付"
+    category: "operating"
+
+  支付的各项税费:
+    level2_codes: []
+    aliases:
+      - "税费支付"
+      - "支付的税费"
+    category: "operating"
+
+  经营活动现金流出小计:
+    level2_codes: []
+    aliases:
+      - "经营活动现金流出"
+    category: "operating"
+
+  经营活动产生的现金流量净额:
+    level2_codes: []
+    aliases:
+      - "经营活动现金流量净额"
+      - "经营CFO"
+      - "经营活动净现金流"
+    computation: "经营活动现金流入小计 - 经营活动现金流出小计"
+    category: "operating"
+
+  收回投资收到的现金:
+    level2_codes: []
+    aliases: ["收回投资所收到的现金"]
+    category: "investing"
+
+  取得投资收益收到的现金:
+    level2_codes: []
+    aliases: ["取得投资收益所收到的现金"]
+    category: "investing"
+
+  处置固定资产无形资产收回的现金:
+    level2_codes: []
+    aliases:
+      - "处置固定资产、无形资产和其他长期资产收回的现金净额"
+      - "处置固定资产收回的现金"
+    category: "investing"
+
+  投资活动现金流入小计:
+    level2_codes: []
+    aliases: ["投资活动现金流入"]
+    category: "investing"
+
+  购建固定资产无形资产支付的现金:
+    level2_codes: []
+    aliases:
+      - "购建固定资产、无形资产和其他长期资产支付的现金"
+      - "资本支出"
+      - "CAPEX"
+      - "购建固定资产支付的现金"
+    category: "investing"
+
+  投资支付的现金:
+    level2_codes: []
+    aliases: ["投资所支付的现金"]
+    category: "investing"
+
+  投资活动现金流出小计:
+    level2_codes: []
+    aliases: ["投资活动现金流出"]
+    category: "investing"
+
+  投资活动产生的现金流量净额:
+    level2_codes: []
+    aliases:
+      - "投资活动现金流量净额"
+      - "投资CFI"
+    computation: "投资活动现金流入小计 - 投资活动现金流出小计"
+    category: "investing"
+
+  吸收投资收到的现金:
+    level2_codes: []
+    aliases: ["吸收投资所收到的现金", "股权融资"]
+    category: "financing"
+
+  取得借款收到的现金:
+    level2_codes: []
+    aliases:
+      - "取得借款所收到的现金"
+      - "借款所收到的现金"
+    category: "financing"
+
+  筹资活动现金流入小计:
+    level2_codes: []
+    aliases: ["筹资活动现金流入"]
+    category: "financing"
+
+  偿还债务支付的现金:
+    level2_codes: []
+    aliases: ["偿还债务所支付的现金"]
+    category: "financing"
+
+  分配股利利润或偿付利息支付的现金:
+    level2_codes: []
+    aliases:
+      - "分配股利、利润或偿付利息支付的现金"
+      - "分配股利支付的现金"
+      - "偿付利息支付的现金"
+    category: "financing"
+
+  筹资活动现金流出小计:
+    level2_codes: []
+    aliases: ["筹资活动现金流出"]
+    category: "financing"
+
+  筹资活动产生的现金流量净额:
+    level2_codes: []
+    aliases:
+      - "筹资活动现金流量净额"
+      - "筹资CFF"
+    computation: "筹资活动现金流入小计 - 筹资活动现金流出小计"
+    category: "financing"
+
+  汇率变动对现金的影响:
+    level2_codes: []
+    aliases: ["汇率变动对现金及现金等价物的影响"]
+    category: "other"
+
+  期初现金及现金等价物余额:
+    level2_codes: []
+    aliases: ["期初现金余额", "年初现金"]
+    category: "other"
+
+  期末现金及现金等价物余额:
+    level2_codes: []
+    aliases: ["期末现金余额", "年末现金"]
+    computation: "期初现金 + 经营CFO + 投资CFI + 筹资CFF + 汇率变动影响"
+    category: "other"
+
+# ============================================================================
+# 附注关键科目（用于异常检测）
+# ============================================================================
+notes_items:
+  应收账款坏账准备:
+    aliases:
+      - "坏账准备"
+      - "应收账款减值准备"
+      - "应收款项减值准备"
+    parent_account: "应收账款"
+
+  存货跌价准备:
+    aliases:
+      - "存货减值准备"
+      - "存货跌价"
+    parent_account: "存货"
+
+  固定资产减值准备:
+    aliases:
+      - "固定资产减值"
+    parent_account: "固定资产"
+
+  商誉减值准备:
+    aliases:
+      - "商誉减值"
+    parent_account: "商誉"
+
+  研发费用-资本化金额:
+    aliases:
+      - "开发支出增加额"
+      - "研发资本化金额"
+    parent_account: "研发费用"
+
+  折旧费用:
+    aliases:
+      - "固定资产折旧"
+      - "当期折旧"
+    parent_account: "累计折旧"

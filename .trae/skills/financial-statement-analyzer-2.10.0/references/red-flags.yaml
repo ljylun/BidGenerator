@@ -1,0 +1,495 @@
+# ============================================================================
+# 21红灯信号规则配置（热加载）
+# ============================================================================
+# 每条约含：condition表达式、severity(P0/P1)、risk_type、cause_path、linked_signals
+# condition 中的变量从三表数据上下文中求值
+#
+# 作者: 优方皑尔 Uform Ai
+# 版本: v1.0.0
+# ============================================================================
+
+metadata:
+  version: "1.0.0"
+  total_signals: 21
+  last_updated: "2026-06-14"
+
+# ============================================================================
+# 默认联动升级规则
+# ============================================================================
+linked_upgrade_rules:
+  - id: "LU-01"
+    name: "收入与应收双重确认"
+    linked_signals: ["R-01", "R-13"]
+    description: "收入与现金流背离 + 应收增速远超收入 → 双重确认收入虚增"
+    upgrade: "P1→P0"
+
+  - id: "LU-02"
+    name: "存货与毛利双重异常"
+    linked_signals: ["R-02", "R-16"]
+    description: "存货积压 + 存贷双高 → 大规模资金占用"
+    upgrade: "P0+额外权重"
+
+  - id: "LU-03"
+    name: "现金流全面恶化"
+    linked_signals: ["R-01", "R-15"]
+    description: "经营CF持续背离 + CFO/净利极低 → 盈利质量严重恶化"
+    upgrade: "P0+额外权重"
+
+  - id: "LU-04"
+    name: "研发与商誉双重风险"
+    linked_signals: ["R-17", "R-20"]
+    description: "商誉减值滞后 + 研发资本化激进 → 资产质量可疑"
+    upgrade: "P0+额外权重"
+
+# ============================================================================
+# 基础勾稽层（R-01 ~ R-12）
+# ============================================================================
+signals:
+  # --- 基础勾稽层 ---
+  - id: "R-01"
+    name: "收入vs经营CF背离"
+    description: "净利连增，CF连负且差距扩大"
+    category: "基础勾稽"
+    severity: "P0"
+    risk_type: "收入类粉饰"
+    condition: "net_profit_growth_trend == 'increasing' and operating_cf_trend == 'negative' and operating_cf_net_income_gap_widening"
+    detection:
+      net_profit_growth_trend:
+        method: "check_consecutive_increase"
+        field: "净利润"
+        min_periods: 2
+      operating_cf_trend:
+        method: "check_consecutive_negative"
+        field: "经营活动产生的现金流量净额"
+        min_periods: 2
+      operating_cf_net_income_gap_widening:
+        method: "check_gap_widening"
+        field_a: "净利润"
+        field_b: "经营活动产生的现金流量净额"
+        min_periods: 2
+    cause_path: "虚增利润 → 应收挂账不回收 → 经营CF连年为负 → 账面利润与现金脱节"
+    linked_signals: ["R-13", "R-15"]
+    audit_procedure: "应收账款函证 + 收入截止测试 + 期后回款检查"
+
+  - id: "R-02"
+    name: "存货vs营业成本背离"
+    description: "存货增速远超成本增速，周转天数飙升"
+    category: "基础勾稽"
+    severity: "P0"
+    risk_type: "资产类粉饰"
+    condition: "inventory_growth_rate > cost_growth_rate * 1.5 and inventory_turnover_days_change > 0.3"
+    detection:
+      inventory_growth_rate:
+        method: "compute_growth_rate"
+        field: "存货"
+      cost_growth_rate:
+        method: "compute_growth_rate"
+        field: "营业成本"
+      inventory_turnover_days_change:
+        method: "compute_relative_change"
+        field: "存货周转天数"
+    cause_path: "保利润目标 → 加大产量 → 单位固定成本摊薄 → 毛利率虚升 → 存货积压仓库 → 未提跌价准备 → 账面利润虚增"
+    linked_signals: ["R-16"]
+    audit_procedure: "存货监盘 + 可变现净值测试 + 库龄分析"
+
+  - id: "R-03"
+    name: "货币资金vs有息负债背离"
+    description: "存贷双高，利息收支背离"
+    category: "基础勾稽"
+    severity: "P0"
+    risk_type: "资产类粉饰"
+    condition: "cash_to_total_assets > 0.20 and interest_bearing_debt_to_total_assets > 0.30 and interest_income_expense_divergence"
+    detection:
+      cash_to_total_assets:
+        method: "compute_ratio"
+        numerator: "货币资金"
+        denominator: "总资产"
+        threshold: 0.20
+      interest_bearing_debt_to_total_assets:
+        method: "compute_ratio"
+        numerator: "有息负债"
+        denominator: "总资产"
+        threshold: 0.30
+      interest_income_expense_divergence:
+        method: "check_divergence"
+        field_a: "利息收入"
+        field_b: "利息费用"
+        threshold: 0.5
+    cause_path: "账面货币资金充裕却大量举债 → 利息收入远低于利息支出 → 货币资金可能被挪用或虚构"
+    linked_signals: ["R-16"]
+    audit_procedure: "银行函证全覆盖 + 受限资金核查 + 利息收支重算"
+
+  - id: "R-04"
+    name: "所得税vs利润总额背离"
+    description: "账面利润高，所得税异常低"
+    category: "基础勾稽"
+    severity: "P0"
+    risk_type: "税务类风险"
+    condition: "effective_tax_rate < statutory_rate * 0.6 and pretax_profit > 0"
+    detection:
+      effective_tax_rate:
+        method: "compute_ratio"
+        numerator: "所得税费用"
+        denominator: "利润总额"
+      statutory_rate:
+        method: "constant"
+        value: 0.25
+      pretax_profit:
+        method: "check_positive"
+        field: "利润总额"
+    cause_path: "账面利润虚增 → 实际税负无对应增长 → 利润造假或多享受税收优惠"
+    linked_signals: []
+    audit_procedure: "所得税汇算清缴核对 + 递延税调节分析"
+
+  - id: "R-05"
+    name: "商誉减值滞后"
+    description: "业绩承诺到期未减值，现金流恶化"
+    category: "基础勾稽"
+    severity: "P0"
+    risk_type: "资产类粉饰"
+    condition: "goodwill_to_equity > 0.30 and performance_commitment_expired and not_impaired and cash_flow_deteriorating"
+    detection:
+      goodwill_to_equity:
+        method: "compute_ratio"
+        numerator: "商誉"
+        denominator: "净资产"
+        threshold: 0.30
+      performance_commitment_expired:
+        method: "manual_flag"
+      not_impaired:
+        method: "check_no_impairment"
+        field: "商誉减值损失"
+      cash_flow_deteriorating:
+        method: "check_deteriorating"
+        field: "经营活动产生的现金流量净额"
+    cause_path: "收购标的业绩不达标 → 规避商誉减值测试 → 商誉悬空 → 未来减值损失巨大 → 利润断崖"
+    linked_signals: ["R-17"]
+    audit_procedure: "商誉减值测试复核 + 独立现金流预测评估"
+
+  - id: "R-06"
+    name: "往来款异常"
+    description: "长期挂账金额巨大"
+    category: "基础勾稽"
+    severity: "P0"
+    risk_type: "关联交易类"
+    condition: "other_receivables_to_total_assets > 0.05 or long_aging_receivables_exist"
+    detection:
+      other_receivables_to_total_assets:
+        method: "compute_ratio"
+        numerator: "其他应收款"
+        denominator: "总资产"
+        threshold: 0.05
+      long_aging_receivables_exist:
+        method: "check_aging"
+        field: "其他应收款"
+        threshold_days: 365
+    cause_path: "关联方通过往来款占用资金 → 费用挂账 → 资产虚增 → 资金被挪用"
+    linked_signals: ["R-18"]
+    audit_procedure: "往来款函证 + 关联方识别 + 账龄分析"
+
+  - id: "R-07"
+    name: "固定资产vs购建现金+折旧偏差"
+    description: "固定资产变动与购建现金+折旧偏差>20%"
+    category: "基础勾稽"
+    severity: "P1"
+    risk_type: "资产类粉饰"
+    condition: "abs(fixed_asset_change - (capex - depreciation_this_period)) / avg_fixed_asset > 0.20"
+    detection:
+      fixed_asset_change:
+        method: "compute_change"
+        field: "固定资产净额"
+      capex:
+        method: "get_field"
+        field: "购建固定资产无形资产支付的现金"
+      depreciation_this_period:
+        method: "compute_change"
+        field: "累计折旧"
+    cause_path: "固定资产账面价值与现金支出不匹配 → 可能虚列固定资产 → 粉饰资产规模"
+    linked_signals: []
+    audit_procedure: "固定资产盘点 + 在建工程转固时点检查"
+
+  - id: "R-08"
+    name: "借款vs取得/偿还现金偏差"
+    description: "借款变动与取得/偿还现金偏差>10%"
+    category: "基础勾稽"
+    severity: "P1"
+    risk_type: "负债类风险"
+    condition: "abs(borrowing_change - (new_borrowings - repayments)) / avg_borrowing > 0.10"
+    detection:
+      borrowing_change:
+        method: "compute_change"
+        field: "有息负债"
+      new_borrowings:
+        method: "get_field"
+        field: "取得借款收到的现金"
+      repayments:
+        method: "get_field"
+        field: "偿还债务支付的现金"
+    cause_path: "借款变动与现金流量表不匹配 → 借款分类错误或体外借款"
+    linked_signals: []
+    audit_procedure: "银行询证函 + 借款合同检查"
+
+  - id: "R-09"
+    name: "应交税费vs所得税+税金支付偏差"
+    description: "应交税费变动与所得税+税金支付偏差>15%"
+    category: "基础勾稽"
+    severity: "P0"
+    risk_type: "税务类风险"
+    condition: "abs(tax_payable_change - (income_tax_expense + vat_other_tax_paid)) / avg_tax_payable > 0.15"
+    detection:
+      tax_payable_change:
+        method: "compute_change"
+        field: "应交税费"
+      income_tax_expense:
+        method: "get_field"
+        field: "所得税费用"
+      vat_other_tax_paid:
+        method: "get_field"
+        field: "支付的各项税费"
+    cause_path: "税费科目勾稽不成立 → 税费少计或虚列 → 潜在税务风险"
+    linked_signals: ["R-21"]
+    audit_procedure: "纳税申报表核对 + 税务稽查底稿复核"
+
+  - id: "R-10"
+    name: "应付职工薪酬vs计提-支付偏差"
+    description: "应付职工薪酬变动与计提-支付偏差>10%"
+    category: "基础勾稽"
+    severity: "P1"
+    risk_type: "成本费用类"
+    condition: "abs(salary_payable_change - (salary_accrued - salary_paid)) / avg_salary_payable > 0.10"
+    detection:
+      salary_payable_change:
+        method: "compute_change"
+        field: "应付职工薪酬"
+      salary_accrued:
+        method: "estimate_field"
+        field: "管理费用+销售费用中的薪酬"
+      salary_paid:
+        method: "get_field"
+        field: "支付给职工以及为职工支付的现金"
+    cause_path: "薪酬计提与支付偏差 → 薪酬费用混列或跨期调节"
+    linked_signals: []
+    audit_procedure: "工资表核对 + 期后付款测试"
+
+  - id: "R-11"
+    name: "递延税资产/负债vs递延费用偏差"
+    description: "递延税变动与递延费用偏差>5%"
+    category: "基础勾稽"
+    severity: "P1"
+    risk_type: "会计政策类"
+    condition: "abs(dta_dtl_change - deferred_tax_expense) / max(abs(dta), abs(dtl)) > 0.05"
+    detection:
+      dta_dtl_change:
+        method: "compute_change"
+        field: "递延所得税资产净额"
+      deferred_tax_expense:
+        method: "compute_field"
+        field: "所得税费用中的递延部分"
+    cause_path: "递延税变动与利润表不匹配 → 税率调整或递延税确认错误"
+    linked_signals: []
+    audit_procedure: "递延税资产/负债明细核对"
+
+  - id: "R-12"
+    name: "利息费用vs有息负债×利率偏差"
+    description: "利息费用与有息负债×利率偏差>15%"
+    category: "基础勾稽"
+    severity: "P1"
+    risk_type: "负债类风险"
+    condition: "abs(interest_expense - avg_debt * estimated_rate) / interest_expense > 0.15"
+    detection:
+      interest_expense:
+        method: "get_field"
+        field: "利息费用"
+      avg_debt:
+        method: "compute_average"
+        field: "有息负债"
+      estimated_rate:
+        method: "estimate"
+        field: "市场利率"
+        default: 0.045
+    cause_path: "利息费用与债务规模不匹配 → 利息资本化过度或体外债务"
+    linked_signals: []
+    audit_procedure: "利息费用重新计算 + 资本化利息核查"
+
+  # --- 资产质量层 ---
+  - id: "R-13"
+    name: "应收账款膨胀率"
+    description: "应收增长率/收入增长率 > 1.5"
+    category: "资产质量"
+    severity: "P0"
+    risk_type: "收入类粉饰"
+    condition: "receivables_growth / revenue_growth > 1.5 and revenue_growth > 0"
+    detection:
+      receivables_growth:
+        method: "compute_growth_rate"
+        field: "应收账款"
+      revenue_growth:
+        method: "compute_growth_rate"
+        field: "营业收入"
+    cause_path: "放宽赊销政策 → 应收膨胀 → 收入虚增 → 现金流恶化"
+    linked_signals: ["R-01", "R-15"]
+    audit_procedure: "应收账款函证（前20大客户）+ 期后回款测试"
+
+  - id: "R-14"
+    name: "预收账款异常下降"
+    description: "预收降幅/收入降幅 > 2.0 且预收降 > 30%"
+    category: "资产质量"
+    severity: "P1"
+    risk_type: "收入类粉饰"
+    condition: "contract_liability_decline > 0.30 and (contract_liability_decline_rate / max(revenue_decline_rate, 0.01)) > 2.0"
+    detection:
+      contract_liability_decline:
+        method: "compute_decline_rate"
+        field: "合同负债"
+      revenue_decline_rate:
+        method: "compute_decline_rate"
+        field: "营业收入"
+    cause_path: "合同负债剧烈下降 → 提前确认收入 → 未来收入空间透支"
+    linked_signals: []
+    audit_procedure: "合同履约进度检查 + 收入截止测试"
+
+  - id: "R-15"
+    name: "经营CFO/净利背离"
+    description: "CFO/净利 < 0.3 持续2期"
+    category: "资产质量"
+    severity: "P0"
+    risk_type: "现金流质量"
+    condition: "cfo_to_net_income < 0.3 and consecutive_periods >= 2"
+    detection:
+      cfo_to_net_income:
+        method: "compute_ratio"
+        numerator: "经营活动产生的现金流量净额"
+        denominator: "净利润"
+      consecutive_periods:
+        method: "check_consecutive"
+        condition: "cfo_to_net_income < 0.3"
+        min_periods: 2
+    cause_path: "利润高但无现金流入 → 盈利质量极差 → 大量应收或虚假收入"
+    linked_signals: ["R-01", "R-13"]
+    audit_procedure: "经营现金流间接法还原 + 大额应收穿透"
+
+  - id: "R-16"
+    name: "存贷双高"
+    description: "货币/总资产>20% AND 有息负债/总资产>30%"
+    category: "资产质量"
+    severity: "P0"
+    risk_type: "财务造假"
+    condition: "cash_to_total_assets > 0.20 and interest_bearing_debt_to_total_assets > 0.30"
+    detection:
+      cash_to_total_assets:
+        method: "compute_ratio"
+        numerator: "货币资金"
+        denominator: "总资产"
+        threshold: 0.20
+      interest_bearing_debt_to_total_assets:
+        method: "compute_ratio"
+        numerator: "有息负债"
+        denominator: "总资产"
+        threshold: 0.30
+    cause_path: "既有大量现金又大量举债 → 现金可能被挪用/虚构/受限 → 康美/康得新典型特征"
+    linked_signals: ["R-02", "R-03"]
+    audit_procedure: "银行函证全覆盖 + 受限资金明细 + 利息收支重算"
+
+  - id: "R-17"
+    name: "商誉减值滞后"
+    description: "商誉/净资产>30% AND 未达标 AND 未减值"
+    category: "资产质量"
+    severity: "P0"
+    risk_type: "盈余操纵"
+    condition: "goodwill_to_equity > 0.30 and performance_met == false and impairment_taken == false"
+    detection:
+      goodwill_to_equity:
+        method: "compute_ratio"
+        numerator: "商誉"
+        denominator: "净资产"
+        threshold: 0.30
+      performance_met:
+        method: "manual_flag"
+        default: false
+      impairment_taken:
+        method: "check_field_zero"
+        field: "商誉减值损失"
+    cause_path: "收购标的业绩不达预期 → 规避减值测试 → 商誉悬空 → 未来爆雷"
+    linked_signals: ["R-05"]
+    audit_procedure: "商誉减值测试独立复核 + 敏感性分析"
+
+  - id: "R-18"
+    name: "其他应收款异常"
+    description: "其他应收款/总资产 > 5%"
+    category: "资产质量"
+    severity: "P1"
+    risk_type: "关联交易类"
+    condition: "other_receivables_to_total_assets > 0.05"
+    detection:
+      other_receivables_to_total_assets:
+        method: "compute_ratio"
+        numerator: "其他应收款"
+        denominator: "总资产"
+        threshold: 0.05
+    cause_path: "其他应收款占比过高 → 关联方通过往来款占用资金 → 大股东占款"
+    linked_signals: ["R-06"]
+    audit_procedure: "其他应收款明细检查 + 关联方识别 + 资金流向追踪"
+
+  - id: "R-19"
+    name: "短债长投错配"
+    description: "流动负债/总负债>70% AND 在建2年增幅>50%"
+    category: "资产质量"
+    severity: "P0"
+    risk_type: "流动性风险"
+    condition: "current_liability_ratio > 0.70 and construction_in_progress_2yr_growth > 0.50"
+    detection:
+      current_liability_ratio:
+        method: "compute_ratio"
+        numerator: "流动负债"
+        denominator: "总负债"
+        threshold: 0.70
+      construction_in_progress_2yr_growth:
+        method: "compute_growth_rate_2yr"
+        field: "在建工程"
+        threshold: 0.50
+    cause_path: "用短期借款投入长期在建 → 短期偿债压力巨大 → 资金链断裂风险"
+    linked_signals: []
+    audit_procedure: "债务期限结构分析 + 在建工程进度检查 + 流动性压力测试"
+
+  - id: "R-20"
+    name: "研发资本化激进"
+    description: "研发资本化率>30%且同比+10pp"
+    category: "资产质量"
+    severity: "P0"
+    risk_type: "盈余操纵"
+    condition: "rd_capitalization_rate > 0.30 and rd_capitalization_rate_change > 0.10"
+    detection:
+      rd_capitalization_rate:
+        method: "compute_ratio"
+        numerator: "开发支出增加额"
+        denominator: "研发费用合计"
+        threshold: 0.30
+      rd_capitalization_rate_change:
+        method: "compute_pp_change"
+        field: "rd_capitalization_rate"
+        threshold: 0.10
+    cause_path: "研发资本化率过高且快速上升 → 费用延后确认 → 当期利润虚增 → 未来摊销压力大"
+    linked_signals: []
+    audit_procedure: "研发穿行测试 + 资本化5条件逐条复核"
+
+  - id: "R-21"
+    name: "增值税与收入背离"
+    description: "增值税增量/税率与收入增量差异>20%"
+    category: "资产质量"
+    severity: "P0"
+    risk_type: "收入类粉饰"
+    condition: "abs((vat_change / vat_rate - revenue_change) / revenue_change) > 0.20"
+    detection:
+      vat_change:
+        method: "compute_change"
+        field: "应交增值税"
+      vat_rate:
+        method: "estimate"
+        field: "增值税税率"
+        default: 0.13
+      revenue_change:
+        method: "compute_change"
+        field: "营业收入"
+    cause_path: "增值税增量与收入增量严重不匹配 → 收入可能造假"
+    linked_signals: ["R-09"]
+    audit_procedure: "增值税申报表与收入明细核对 + 销项发票检查"

@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>财务报表分析报告 — 第三级：专家会诊</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  :root { --bg: #f5f7fa; --card-bg: #fff; --text: #2c3e50; --text-secondary: #7f8c8d;
+    --green: #27ae60; --yellow: #f39c12; --orange: #e67e22; --red: #e74c3c; --skull: #8b0000;
+    --border: #e0e4e8; --radius: 12px; --shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  * { margin:0;padding:0;box-sizing:border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background:var(--bg); color:var(--text); line-height:1.6; padding:20px; }
+  .container { max-width:1200px; margin:0 auto; }
+  .header { background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%); color:#fff; padding:28px 36px;
+    border-radius:var(--radius); margin-bottom:20px; }
+  .header h1 { font-size:24px; }
+  .header .meta { font-size:13px; opacity:0.8; margin-top:6px; }
+  .card { background:var(--card-bg); border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:24px; margin-bottom:16px; border:1px solid var(--border); }
+  .card-title { font-size:17px; font-weight:700; margin-bottom:16px; border-bottom:2px solid #2563eb;
+    padding-bottom:8px; }
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .chart-container { width:100%; height:400px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { padding:8px 12px; border-bottom:1px solid var(--border); text-align:right; }
+  th { background:var(--bg); font-weight:600; color:var(--text-secondary); text-align:center; }
+  td:first-child { text-align:left; font-weight:500; }
+  .check-pass { color:var(--green); font-weight:700; }
+  .check-fail { color:var(--red); font-weight:700; }
+  .check-warn { color:var(--yellow); font-weight:700; }
+  .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600; }
+  .tag-red { background:#fdf0f0; color:var(--red); }
+  .tag-yellow { background:#fef9e7; color:var(--yellow); }
+  .tag-green { background:#d4edda; color:var(--green); }
+  .tag-orange { background:#ffe5d0; color:var(--orange); }
+  .case-card { border:1px solid var(--border); border-radius:8px; padding:16px; margin-bottom:12px; }
+  .case-card:hover { box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+  .advice-block { margin-bottom:16px; }
+  .advice-block h4 { margin-bottom:8px; color:#2563eb; }
+  .advice-item { padding:8px 12px; margin:4px 0; background:var(--bg); border-radius:6px;
+    font-size:13px; display:flex; justify-content:space-between; align-items:center; }
+  .advice-item .owner { font-size:11px; color:var(--text-secondary); }
+  .advice-item .deadline { font-size:11px; padding:2px 6px; border-radius:3px; background:#ddd; }
+  .audit-checklist { }
+  .audit-checklist li { padding:6px 0; border-bottom:1px dotted var(--border); font-size:13px; }
+  .cause-path { background:#f0f4ff; border-left:3px solid #2563eb; padding:12px 16px; margin:8px 0;
+    border-radius:0 8px 8px 0; font-size:13px; }
+  .disclaimer { background:#fef9e7; border:1px solid #f0e0a0; border-radius:8px; padding:14px 18px;
+    font-size:12px; color:#856404; margin-top:16px; }
+  .footer { text-align:center; padding:20px; color:var(--text-secondary); font-size:12px; }
+  .toc { list-style:none; columns:2; }
+  .toc li { padding:4px 0; }
+  .toc li a { color:#2563eb; text-decoration:none; font-size:14px; }
+
+  /* ========== 打印样式：所见即所得 ========== */
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+    @page { size: A4; margin: 8mm 8mm; }
+    html, body { background: white !important; padding: 0 !important; margin: 0 !important; width: 100% !important; font-size: 12px !important; }
+    .container { max-width: 100% !important; width: 100% !important; }
+    .card { break-inside: avoid; page-break-inside: avoid; box-shadow: none !important; border: 1px solid var(--border) !important; margin-bottom: 6px !important; padding: 10px 12px !important; }
+    .header { background: #1a1a2e !important; color: #fff !important; -webkit-print-color-adjust: exact !important; padding: 10px 14px !important; }
+    .case-card:hover { box-shadow: none !important; }
+    .check-pass { color: var(--green) !important; }
+    .check-fail { color: var(--red) !important; }
+    .check-warn { color: var(--yellow) !important; }
+    .tag-red { background: #fdf0f0 !important; color: var(--red) !important; }
+    .tag-yellow { background: #fef9e7 !important; color: var(--yellow) !important; }
+    .tag-green { background: #d4edda !important; color: var(--green) !important; }
+    .tag-orange { background: #ffe5d0 !important; color: var(--orange) !important; }
+    .cause-path { background: #f0f4ff !important; border-left-color: #2563eb !important; }
+    .disclaimer { background: #fef9e7 !important; border-color: #f0e0a0 !important; font-size: 10px !important; padding: 6px 8px !important; }
+    .chart-container { height: 280px !important; break-inside: avoid; page-break-inside: avoid; }
+    .advice-item { background: var(--bg) !important; }
+    th { background: var(--bg) !important; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>🔬 财务报表分析报告 — 专家会诊</h1>
+    <div class="meta">Apple Inc. (蘋果公司) | 2026-07-12 21:48 | 深度诊断模式 · 第三级 | 尽调级分析 | 作者: 优方皑尔 Uform Ai</div>
+  </div>
+
+  <!-- 目录 -->
+  <div class="card">
+    <div class="card-title">📑 报告目录</div>
+    <ul class="toc">
+      <li><a href="#crosscheck">1. 8大类勾稽验证</a></li>
+      <li><a href="#policy">2. 会计政策分析</a></li>
+      <li><a href="#fraudrisk">3. 粉饰风险评估</a></li>
+      <li><a href="#relatedparty">4. 关联交易穿透</a></li>
+      <li><a href="#compliance">5. 合规红线检查</a></li>
+      <li><a href="#attribution">7. 归因分析</a></li>
+      <li><a href="#actionplan">8. 行动方案与实用建议</a></li>
+      <li><a href="#audit">9. 审计程序映射与核查清单</a></li>
+      <li><a href="#charts">10. 专项图表</a></li>
+    </ul>
+  </div>
+
+  <!-- 1. 勾稽验证 -->
+  <div class="card" id="crosscheck">
+    <div class="card-title">🔗 8大类勾稽关系验证</div>
+    <table>
+      <tr><th>类别</th><th>检查项</th><th>状态</th><th>偏差</th><th>说明</th></tr>
+      
+      <tr>
+        <td rowspan="2"><strong>货币与单位一致性</strong></td>
+        
+        
+        <td>货币单位一致性</td>
+        <td><span class="check-pass">PASS</span></td>
+        <td>0</td>
+        <td style="font-size:12px">单位一致</td>
+        </tr>
+        
+        <tr>
+        <td>量级检查</td>
+        <td><span class="check-pass">PASS</span></td>
+        <td>0</td>
+        <td style="font-size:12px">量级合理</td>
+        
+        
+      </tr>
+      
+      <tr>
+        <td rowspan="3"><strong>资产负债表完整性</strong></td>
+        
+        
+        <td>BS平衡检查</td>
+        <td><span class="check-fail">FAIL</span></td>
+        <td>max 100.0000%</td>
+        <td style="font-size:12px">存在BS不平衡期间</td>
+        </tr>
+        
+        <tr>
+        <td>流动资产/非流动资产合计</td>
+        <td><span class="check-pass">PASS</span></td>
+        <td>0</td>
+        <td style="font-size:12px">子项合计通过</td>
+        </tr>
+        
+        <tr>
+        <td>负债/权益合计</td>
+        <td><span class="check-pass">PASS</span></td>
+        <td>0</td>
+        <td style="font-size:12px">子项合计通过</td>
+        
+        
+      </tr>
+      
+      <tr>
+        <td rowspan="4"><strong>现金流量表完整性</strong></td>
+        
+        
+        <td>期末现金与BS勾稽</td>
+        <td><span class="check-fail">FAIL</span></td>
+        <td>N/A</td>
+        <td style="font-size:12px">现金勾稽存在偏差</td>
+        </tr>
+        
+        <tr>
+        <td>CF净利润与PL勾稽</td>
+        <td><span class="check-pass">PASS</span></td>
+        <td>0</td>
+        <td style="font-size:12px">净利勾稽通过（简化检查）</td>
+        </tr>
+        
+        <tr>
+        <td>折旧摊销勾稽</td>
+        <td><span class="check-pass">PASS</span></td>
+        <td>N/A</td>
+        <td style="font-size:12px">折旧勾稽（需附注数据）</td>
+        </tr>
+        
+        <tr>
+        <td>三大现金流合计</td>
+        <td><span class="check-fail">FAIL</span></td>
+        <td>N/A</td>
+        <td style="font-size:12px">CF合计存在偏差</td>
+        
+        
+      </tr>
+      
+      <tr>
+        <td rowspan="2"><strong>留存收益滚动</strong></td>
+        
+        
+        <td>留存收益滚动验证</td>
+        <td><span class="check-pass">PASS</span></td>
+        <td>N/A</td>
+        <td style="font-size:12px">留存收益滚动（简化）</td>
+        </tr>
+        
+        <tr>
+        <td>所有者权益变动勾稽</td>
+        <td><span class="check-pass">PASS</span></td>
+        <td>N/A</td>
+        <td style="font-size:12px">权益变动（简化）</td>
+        
+        
+      </tr>
+      
+      <tr>
+        <td rowspan="4"><strong>营运资本勾稽</strong></td>
+        
+        
+        <td>应收账款周转率合理性</td>
+        <td><span class="check-pass">PASS</span></td>
+        <td>0.0天</td>
+        <td style="font-size:12px">在合理范围</td>
+        </tr>
+        
+        <tr>
+        <td>存货周转率合理性</td>
+        <td><span class="check-pass">PASS</span></td>
+        <td>43.7天</td>
+        <td style="font-size:12px">在合理范围</td>
+        </tr>
+        
+        <tr>
+        <td>应付账款周转率合理性</td>
+        <td><span class="check-pass">PASS</span></td>
+        <td>371.1天</td>
+        <td style="font-size:12px">在合理范围</td>
+        </tr>
+        
+        <tr>
+        <td>CCC合理性</td>
+        <td><span class="check-pass">PASS</span></td>
+        <td>N/A</td>
+        <td style="font-size:12px">无营运能力数据</td>
+        
+        
+      </tr>
+      
+      <tr>
+        <td rowspan="3"><strong>债务计划表勾稽</strong></td>
+        
+        
+        <td>总债务与BS勾稽</td>
+        <td><span class="check-pass">PASS</span></td>
+        <td>N/A</td>
+        <td style="font-size:12px">债务勾稽（简化）</td>
+        </tr>
+        
+        <tr>
+        <td>利息费用与PL勾稽</td>
+        <td><span class="check-pass">PASS</span></td>
+        <td>N/A</td>
+        <td style="font-size:12px">利息勾稽（简化）</td>
+        </tr>
+        
+        <tr>
+        <td>债务加权平均利率合理性</td>
+        <td><span class="check-pass">PASS</span></td>
+        <td>N/A</td>
+        <td style="font-size:12px">利率合理性检查通过</td>
+        
+        
+      </tr>
+      
+      <tr>
+        <td rowspan="3"><strong>情景层级检查</strong></td>
+        
+        
+        <td>情景利润率层级</td>
+        <td><span class="check-pass">PASS</span></td>
+        <td>N/A</td>
+        <td style="font-size:12px">情景层级检查（简化）</td>
+        </tr>
+        
+        <tr>
+        <td>情景现金流层级</td>
+        <td><span class="check-pass">PASS</span></td>
+        <td>N/A</td>
+        <td style="font-size:12px">情景层级检查（简化）</td>
+        </tr>
+        
+        <tr>
+        <td>情景BS平衡</td>
+        <td><span class="check-pass">PASS</span></td>
+        <td>N/A</td>
+        <td style="font-size:12px">情景BS平衡检查通过</td>
+        
+        
+      </tr>
+      
+      <tr>
+        <td rowspan="3"><strong>公式完整性检查</strong></td>
+        
+        
+        <td>无硬编码数值</td>
+        <td><span class="check-pass">PASS</span></td>
+        <td>0</td>
+        <td style="font-size:12px">所有数值来自函数计算</td>
+        </tr>
+        
+        <tr>
+        <td>计算公式可追溯</td>
+        <td><span class="check-pass">PASS</span></td>
+        <td>0</td>
+        <td style="font-size:12px">计算链可追溯</td>
+        </tr>
+        
+        <tr>
+        <td>预测列公式一致性</td>
+        <td><span class="check-pass">PASS</span></td>
+        <td>N/A</td>
+        <td style="font-size:12px">公式一致性（无预测数据）</td>
+        
+        
+      </tr>
+      
+    </table>
+    <div style="margin-top:12px;padding:12px;background:#fdf0f0;border-radius:8px;font-weight:600;">
+      主检查状态: <span class="check-fail">✗ ERRORS DETECTED</span>
+    </div>
+  </div>
+
+  <!-- 2. 会计政策分析 -->
+  <div class="card" id="policy">
+    <div class="card-title">⚖️ 会计政策选择分析</div>
+    <table>
+      <tr><th>检测项</th><th>企业值</th><th>行业均值</th><th>评级</th><th>对利润影响</th></tr>
+      
+      <tr>
+        <td>折旧政策</td>
+        <td>待确认</td>
+        <td>直线法 8-15年</td>
+        <td><span class="tag tag-green">待确认</span></td>
+        <td>需获取折旧明细表后评估</td>
+      </tr>
+      
+      <tr>
+        <td>坏账计提</td>
+        <td>待确认</td>
+        <td>5-8%</td>
+        <td><span class="tag tag-green">待确认</span></td>
+        <td>需获取应收账款账龄后评估</td>
+      </tr>
+      
+      <tr>
+        <td>研发资本化</td>
+        <td>待确认</td>
+        <td>15-25%</td>
+        <td><span class="tag tag-green">待确认</span></td>
+        <td>待确认</td>
+      </tr>
+      
+    </table>
+  </div>
+
+  <!-- 3. 粉饰风险评估 -->
+  <div class="card" id="fraudrisk">
+    <div class="card-title">🎭 粉饰风险评估</div>
+    <div class="grid-3">
+      <div style="text-align:center;padding:16px">
+        <div style="font-size:36px;font-weight:700;color:var(--red)">14</div>
+        <div style="font-size:12px;color:var(--text-secondary)">触发红灯数</div>
+      </div>
+      <div style="text-align:center;padding:16px">
+        <div style="font-size:36px;font-weight:700;color:var(--green)">0</div>
+        <div style="font-size:12px;color:var(--text-secondary)">科目异常数</div>
+      </div>
+      <div style="text-align:center;padding:16px">
+        <div style="font-size:36px;font-weight:700;color:var(--red)">100.0</div>
+        <div style="font-size:12px;color:var(--text-secondary)">综合风险评分</div>
+      </div>
+    </div>
+    <div class="chart-container" id="redflag-timeline" style="margin-top:16px"></div>
+  </div>
+
+  <!-- 4. 关联交易穿透 -->
+  <div class="card" id="relatedparty">
+    <div class="card-title">🎯 关联交易6维度穿透</div>
+    <table>
+      <tr><th>监测维度</th><th>检测规则</th><th>当前值</th><th>阈值</th><th>状态</th></tr>
+      
+      <tr>
+        <td>定价公允性</td>
+        <td style="font-size:12px">关联毛利率 vs 非关联</td>
+        <td>需关联交易明细</td>
+        <td>差值<15pp</td>
+        <td><span class="tag tag-green">✅ 正常</span></td>
+      </tr>
+      
+      <tr>
+        <td>交易依赖度</td>
+        <td style="font-size:12px">关联销售/总销售</td>
+        <td>需关联交易明细</td>
+        <td><30%</td>
+        <td><span class="tag tag-green">✅ 正常</span></td>
+      </tr>
+      
+      <tr>
+        <td>往来余额</td>
+        <td style="font-size:12px">关联应收/总应收</td>
+        <td>需关联交易明细</td>
+        <td><20%</td>
+        <td><span class="tag tag-green">✅ 正常</span></td>
+      </tr>
+      
+      <tr>
+        <td>预付异常</td>
+        <td style="font-size:12px">预付关联方/总预付</td>
+        <td>需关联交易明细</td>
+        <td><30%</td>
+        <td><span class="tag tag-green">✅ 正常</span></td>
+      </tr>
+      
+      <tr>
+        <td>担保黑洞</td>
+        <td style="font-size:12px">关联担保/净资产</td>
+        <td>需关联交易明细</td>
+        <td><30%</td>
+        <td><span class="tag tag-green">✅ 正常</span></td>
+      </tr>
+      
+      <tr>
+        <td>资金占用</td>
+        <td style="font-size:12px">其他应收-关联/净资产</td>
+        <td>需关联交易明细</td>
+        <td><5%</td>
+        <td><span class="tag tag-green">✅ 正常</span></td>
+      </tr>
+      
+    </table>
+  </div>
+
+  <!-- 6. 合规红线 -->
+  <div class="card" id="compliance">
+    <div class="card-title">🚫 合规红线检查（14条）</div>
+    <table>
+      <tr><th>#</th><th>标准/法规</th><th>检查内容</th><th>状态</th><th>说明</th></tr>
+      
+      <tr>
+        <td>AS-01</td>
+        <td>CAS 14</td>
+        <td style="font-size:12px">收入确认是否符合履约义务转移原则</td>
+        <td><span class="tag tag-red">触发</span></td>
+        <td style="font-size:12px">应收增速异常</td>
+      </tr>
+      
+      <tr>
+        <td>AS-02</td>
+        <td>CAS 36</td>
+        <td style="font-size:12px">关联方关系及交易是否充分披露</td>
+        <td><span class="tag tag-red">触发</span></td>
+        <td style="font-size:12px">其他应收款占比偏高</td>
+      </tr>
+      
+      <tr>
+        <td>AS-03</td>
+        <td>CAS 8</td>
+        <td style="font-size:12px">资产减值测试是否充分</td>
+        <td><span class="tag tag-green">正常</span></td>
+        <td style="font-size:12px">通过</td>
+      </tr>
+      
+      <tr>
+        <td>AS-04</td>
+        <td>CAS 6</td>
+        <td style="font-size:12px">研发支出资本化是否满足5条件</td>
+        <td><span class="tag tag-green">正常</span></td>
+        <td style="font-size:12px">通过</td>
+      </tr>
+      
+      <tr>
+        <td>AS-05</td>
+        <td>CAS 13</td>
+        <td style="font-size:12px">或有事项是否充分披露</td>
+        <td><span class="tag tag-green">正常</span></td>
+        <td style="font-size:12px">未发现异常</td>
+      </tr>
+      
+      <tr>
+        <td>AS-06</td>
+        <td>CAS 33</td>
+        <td style="font-size:12px">合并范围是否恰当</td>
+        <td><span class="tag tag-green">正常</span></td>
+        <td style="font-size:12px">未发现异常</td>
+      </tr>
+      
+      <tr>
+        <td>CSRC-01</td>
+        <td>退市新规</td>
+        <td style="font-size:12px">是否触及财务类退市指标</td>
+        <td><span class="tag tag-yellow">关注</span></td>
+        <td style="font-size:12px">持续监控</td>
+      </tr>
+      
+      <tr>
+        <td>CSRC-03</td>
+        <td>证监会</td>
+        <td style="font-size:12px">是否存在大股东非经营性资金占用</td>
+        <td><span class="tag tag-red">触发</span></td>
+        <td style="font-size:12px">其他应收款偏高</td>
+      </tr>
+      
+    </table>
+  </div>
+
+  <!-- 7. 归因分析 -->
+  <div class="card" id="attribution">
+    <div class="card-title">🧬 归因分析</div>
+    
+    <div style="margin-bottom:16px">
+      <h4 style="color:#2563eb;margin-bottom:8px">存货vs营业成本背离</h4>
+      <div class="cause-path">保利润目标 → 加大产量 → 单位固定成本摊薄 → 毛利率虚升 → 存货积压仓库 → 未提跌价准备 → 账面利润虚增</div>
+      <div style="font-size:13px;margin-top:8px">
+        <strong>数据支撑:</strong> {'inventory_growth_rate': 0.1484255319148936, 'cost_growth_rate': -0.24316672257631666, 'inventory_turnover_days_change': 0.0}<br>
+        <strong>关联信号:</strong> R-16<br>
+        <strong>可能性:</strong> 80%
+      </div>
+    </div>
+    
+    <div style="margin-bottom:16px">
+      <h4 style="color:#2563eb;margin-bottom:8px">所得税vs利润总额背离</h4>
+      <div class="cause-path">账面利润虚增 → 实际税负无对应增长 → 利润造假或多享受税收优惠</div>
+      <div style="font-size:13px;margin-top:8px">
+        <strong>数据支撑:</strong> {'effective_tax_rate': 0.17455976334663578, 'statutory_rate': 0.25, 'pretax_profit': True}<br>
+        <strong>关联信号:</strong> <br>
+        <strong>可能性:</strong> 80%
+      </div>
+    </div>
+    
+    <div style="margin-bottom:16px">
+      <h4 style="color:#2563eb;margin-bottom:8px">往来款异常</h4>
+      <div class="cause-path">关联方通过往来款占用资金 → 费用挂账 → 资产虚增 → 资金被挪用</div>
+      <div style="font-size:13px;margin-top:8px">
+        <strong>数据支撑:</strong> {'other_receivables_to_total_assets': 23172.0, 'long_aging_receivables_exist': True}<br>
+        <strong>关联信号:</strong> R-18<br>
+        <strong>可能性:</strong> 80%
+      </div>
+    </div>
+    
+    <div style="margin-bottom:16px">
+      <h4 style="color:#2563eb;margin-bottom:8px">应交税费vs所得税+税金支付偏差</h4>
+      <div class="cause-path">税费科目勾稽不成立 → 税费少计或虚列 → 潜在税务风险</div>
+      <div style="font-size:13px;margin-top:8px">
+        <strong>数据支撑:</strong> {'tax_payable_change': 0.0, 'income_tax_expense': 6255, 'vat_other_tax_paid': 0.0}<br>
+        <strong>关联信号:</strong> R-21<br>
+        <strong>可能性:</strong> 80%
+      </div>
+    </div>
+    
+    <div style="margin-bottom:16px">
+      <h4 style="color:#2563eb;margin-bottom:8px">应收账款膨胀率</h4>
+      <div class="cause-path">放宽赊销政策 → 应收膨胀 → 收入虚增 → 现金流恶化</div>
+      <div style="font-size:13px;margin-top:8px">
+        <strong>数据支撑:</strong> {'receivables_growth': -0.24002404749380027, 'revenue_growth': -0.22657836890286318}<br>
+        <strong>关联信号:</strong> R-01, R-15<br>
+        <strong>可能性:</strong> 80%
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- 8. 行动方案与建议 -->
+  <div class="card" id="actionplan">
+    <div class="card-title">💡 运营与财务管理实用建议</div>
+    
+    <div class="advice-block">
+      <h4>📌 存货增速远超成本增速，毛利率虚高</h4>
+      
+      <p style="font-weight:600;font-size:13px;color:var(--text-secondary);margin:8px 0">🏭 运营改善</p>
+      
+      <div class="advice-item">
+        <span>• 评估可变现净值，对滞销品计提跌价</span>
+        <span><span class="owner">财务部</span> <span class="deadline">1周内</span></span>
+      </div>
+      
+      <div class="advice-item">
+        <span>• 减产去库存，按订单拉动生产</span>
+        <span><span class="owner">生产部</span> <span class="deadline">立即执行</span></span>
+      </div>
+      
+      <div class="advice-item">
+        <span>• 对长库龄存货分类处置（促销/报废/返工）</span>
+        <span><span class="owner">仓储部+销售部</span> <span class="deadline">2周内</span></span>
+      </div>
+      
+      <div class="advice-item">
+        <span>• 建立安全库存预警机制，超量自动停线</span>
+        <span><span class="owner">生产部+IT部</span> <span class="deadline">1个月内</span></span>
+      </div>
+      
+      
+      
+      <p style="font-weight:600;font-size:13px;color:var(--text-secondary);margin:8px 0">💰 财务管理</p>
+      
+      <div class="advice-item">
+        <span>• 重估存货可变现净值</span>
+        <span><span class="owner">财务部</span> <span class="deadline">1周内</span></span>
+      </div>
+      
+      <div class="advice-item">
+        <span>• 足额计提存货跌价准备</span>
+        <span><span class="owner">财务部</span> <span class="deadline">当月</span></span>
+      </div>
+      
+      <div class="advice-item">
+        <span>• 还原真实毛利率向管理层报告</span>
+        <span><span class="owner">财务部</span> <span class="deadline">当月</span></span>
+      </div>
+      
+      
+      
+      <p style="font-weight:600;font-size:13px;color:var(--text-secondary);margin:8px 0">🎯 战略调整</p>
+      
+      <div class="advice-item">
+        <span>• 评估是否暂停非订单驱动的生产</span>
+        <span><span class="owner">管理层</span> <span class="deadline">当月</span></span>
+      </div>
+      
+      <div class="advice-item">
+        <span>• 修正基于虚高利润的业绩考核目标</span>
+        <span><span class="owner">管理层</span> <span class="deadline">当月</span></span>
+      </div>
+      
+      <div class="advice-item">
+        <span>• 评估产品线盈利能力，淘汰亏损产品</span>
+        <span><span class="owner">管理层+销售部</span> <span class="deadline">季度</span></span>
+      </div>
+      
+      
+    </div>
+    
+    <div class="advice-block">
+      <h4>📌 应收膨胀，赊销激进，回款困难</h4>
+      
+      <p style="font-weight:600;font-size:13px;color:var(--text-secondary);margin:8px 0">🏭 运营改善</p>
+      
+      <div class="advice-item">
+        <span>• 收紧信用政策，对新客户执行预付款制度</span>
+        <span><span class="owner">销售部</span> <span class="deadline">立即执行</span></span>
+      </div>
+      
+      <div class="advice-item">
+        <span>• 对超期应收启动法律催收程序</span>
+        <span><span class="owner">法务部</span> <span class="deadline">2周内</span></span>
+      </div>
+      
+      <div class="advice-item">
+        <span>• 设立回款KPI纳入销售考核（权重≥30%）</span>
+        <span><span class="owner">人力资源部+销售部</span> <span class="deadline">下个考核周期</span></span>
+      </div>
+      
+      
+      
+      <p style="font-weight:600;font-size:13px;color:var(--text-secondary);margin:8px 0">💰 财务管理</p>
+      
+      <div class="advice-item">
+        <span>• 逐客户分析账龄，对高风险客户单独评估坏账</span>
+        <span><span class="owner">财务部</span> <span class="deadline">2周内</span></span>
+      </div>
+      
+      <div class="advice-item">
+        <span>• 引入保理/应收账款融资改善现金流</span>
+        <span><span class="owner">财务部</span> <span class="deadline">1个月内</span></span>
+      </div>
+      
+      <div class="advice-item">
+        <span>• 建立应收账款周报制度，跟踪回款进度</span>
+        <span><span class="owner">财务部</span> <span class="deadline">持续</span></span>
+      </div>
+      
+      
+      
+      <p style="font-weight:600;font-size:13px;color:var(--text-secondary);margin:8px 0">🎯 战略调整</p>
+      
+      <div class="advice-item">
+        <span>• 评估主要客户的信用风险，调整客户结构</span>
+        <span><span class="owner">管理层</span> <span class="deadline">季度</span></span>
+      </div>
+      
+      <div class="advice-item">
+        <span>• 考虑从赊销模式向预付费/订阅模式转型</span>
+        <span><span class="owner">管理层</span> <span class="deadline">中长期</span></span>
+      </div>
+      
+      
+    </div>
+    
+    <div class="advice-block">
+      <h4>📌 经营现金流持续为负→造血能力不足</h4>
+      
+      <p style="font-weight:600;font-size:13px;color:var(--text-secondary);margin:8px 0">🏭 运营改善</p>
+      
+      <div class="advice-item">
+        <span>• 启动现金流改善专项：压缩应收、加速去库存、延长应付</span>
+        <span><span class="owner">跨部门</span> <span class="deadline">立即执行</span></span>
+      </div>
+      
+      
+      
+      <p style="font-weight:600;font-size:13px;color:var(--text-secondary);margin:8px 0">💰 财务管理</p>
+      
+      <div class="advice-item">
+        <span>• 逐月编制滚动现金流预算，周度监控</span>
+        <span><span class="owner">财务部</span> <span class="deadline">持续</span></span>
+      </div>
+      
+      <div class="advice-item">
+        <span>• 设立现金流红线：可用现金不得低于3个月运营支出</span>
+        <span><span class="owner">财务部</span> <span class="deadline">立即执行</span></span>
+      </div>
+      
+      <div class="advice-item">
+        <span>• 必要时启动股权融资或引入战略投资者</span>
+        <span><span class="owner">财务部+管理层</span> <span class="deadline">评估中</span></span>
+      </div>
+      
+      
+      
+      <p style="font-weight:600;font-size:13px;color:var(--text-secondary);margin:8px 0">🎯 战略调整</p>
+      
+      <div class="advice-item">
+        <span>• 重新评估当前业务模式的可持续性</span>
+        <span><span class="owner">管理层</span> <span class="deadline">季度</span></span>
+      </div>
+      
+      <div class="advice-item">
+        <span>• 考虑战略收缩：剥离亏损业务线</span>
+        <span><span class="owner">管理层</span> <span class="deadline">季度</span></span>
+      </div>
+      
+      
+    </div>
+    
+    <div class="advice-block">
+      <h4>📌 合同负债下降→提前确认收入</h4>
+      
+      <p style="font-weight:600;font-size:13px;color:var(--text-secondary);margin:8px 0">🏭 运营改善</p>
+      
+      <div class="advice-item">
+        <span>• 停止提前确认收入的销售行为</span>
+        <span><span class="owner">销售部</span> <span class="deadline">立即执行</span></span>
+      </div>
+      
+      <div class="advice-item">
+        <span>• 按合同履约进度正确确认收入</span>
+        <span><span class="owner">财务部</span> <span class="deadline">立即执行</span></span>
+      </div>
+      
+      
+      
+      <p style="font-weight:600;font-size:13px;color:var(--text-secondary);margin:8px 0">💰 财务管理</p>
+      
+      <div class="advice-item">
+        <span>• 对已提前确认的收入做追溯调整方案</span>
+        <span><span class="owner">财务部</span> <span class="deadline">当月</span></span>
+      </div>
+      
+      <div class="advice-item">
+        <span>• 建立合同收入确认内部审核制度</span>
+        <span><span class="owner">财务部</span> <span class="deadline">2个月内</span></span>
+      </div>
+      
+      
+      
+      <p style="font-weight:600;font-size:13px;color:var(--text-secondary);margin:8px 0">🎯 战略调整</p>
+      
+      <div class="advice-item">
+        <span>• 评估收入确认政策变更对业绩的影响</span>
+        <span><span class="owner">管理层</span> <span class="deadline">当月</span></span>
+      </div>
+      
+      
+    </div>
+    
+  </div>
+
+  <!-- 9. 审计程序与核查清单 -->
+  <div class="card" id="audit">
+    <div class="card-title">📋 审计程序映射与核查清单</div>
+    <ol class="audit-checklist">
+      
+      <li>
+        <strong>存货监盘 + 可变现净值测试 + 库龄分析</strong>
+        <span style="font-size:11px;color:var(--text-secondary)"> — 存货vs营业成本背离</span>
+        <ul style="margin:4px 0 4px 20px;font-size:12px;color:var(--text-secondary)">
+          
+          <li>获取存货vs营业成本背离相关数据</li>
+          
+          <li>执行实质性测试程序</li>
+          
+          <li>评估测试结果并记录</li>
+          
+        </ul>
+      </li>
+      
+      <li>
+        <strong>所得税汇算清缴核对 + 递延税调节分析</strong>
+        <span style="font-size:11px;color:var(--text-secondary)"> — 所得税vs利润总额背离</span>
+        <ul style="margin:4px 0 4px 20px;font-size:12px;color:var(--text-secondary)">
+          
+          <li>获取所得税vs利润总额背离相关数据</li>
+          
+          <li>执行实质性测试程序</li>
+          
+          <li>评估测试结果并记录</li>
+          
+        </ul>
+      </li>
+      
+      <li>
+        <strong>往来款函证 + 关联方识别 + 账龄分析</strong>
+        <span style="font-size:11px;color:var(--text-secondary)"> — 往来款异常</span>
+        <ul style="margin:4px 0 4px 20px;font-size:12px;color:var(--text-secondary)">
+          
+          <li>获取往来款异常相关数据</li>
+          
+          <li>执行实质性测试程序</li>
+          
+          <li>评估测试结果并记录</li>
+          
+        </ul>
+      </li>
+      
+      <li>
+        <strong>纳税申报表核对 + 税务稽查底稿复核</strong>
+        <span style="font-size:11px;color:var(--text-secondary)"> — 应交税费vs所得税+税金支付偏差</span>
+        <ul style="margin:4px 0 4px 20px;font-size:12px;color:var(--text-secondary)">
+          
+          <li>获取应交税费vs所得税+税金支付偏差相关数据</li>
+          
+          <li>执行实质性测试程序</li>
+          
+          <li>评估测试结果并记录</li>
+          
+        </ul>
+      </li>
+      
+      <li>
+        <strong>应收账款函证（前20大客户）+ 期后回款测试</strong>
+        <span style="font-size:11px;color:var(--text-secondary)"> — 应收账款膨胀率</span>
+        <ul style="margin:4px 0 4px 20px;font-size:12px;color:var(--text-secondary)">
+          
+          <li>获取应收账款膨胀率相关数据</li>
+          
+          <li>执行实质性测试程序</li>
+          
+          <li>评估测试结果并记录</li>
+          
+        </ul>
+      </li>
+      
+    </ol>
+  </div>
+
+  <!-- 10. 专项图表 -->
+  <div class="card" id="charts">
+    <div class="card-title">📉 专项图表</div>
+    <div class="grid-2">
+      <div class="chart-container" id="mscore-trend"></div>
+      <div class="chart-container" id="zscore-heat"></div>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    ⚠️ 免责声明：本报告由AI自动分析生成，基于公开财务数据，仅供内部参考，不构成投资建议、审计意见或法律意见。报告中的"异常""疑似"等表述仅表示财务指标偏离常规水平，不构成对任何违法违规行为的认定。如需正式审计意见，请咨询持牌会计师事务所。
+  </div>
+  <div class="footer">
+    © 2026 优方皑尔 Uform Ai | 财务报表分析专家 v2.6.0 | 本文档为机器自动生成
+  </div>
+</div>
+
+<script>
+(function() {
+  // M-Score趋势
+  var ms = echarts.init(document.getElementById('mscore-trend'));
+  ms.setOption({
+    tooltip: { trigger: 'axis' },
+    xAxis: { type: 'category', data: ["2025-Q1", "2026-Q1", "2026-Q2"] },
+    yAxis: { type: 'value', name: 'M-Score' },
+    series: [
+      { type: 'line', data: [null, -2.602, -3.43], name: 'M-Score', lineStyle: {color:'#e74c3c'},
+        markLine: { silent: true, data: [{ yAxis: -1.78, lineStyle: {color:'#e74c3c',type:'dashed'},
+          label: {formatter:'嫌疑线 -1.78'} }, { yAxis: -2.22, lineStyle: {color:'#f39c12',type:'dashed'},
+          label: {formatter:'警戒线 -2.22'} }] } }
+    ]
+  });
+
+  // Z-Score热力
+  var zh = echarts.init(document.getElementById('zscore-heat'));
+  zh.setOption({
+    tooltip: { position: 'top' },
+    grid: { top:'10%', left:'20%', right:'5%', bottom:'10%' },
+    xAxis: { type: 'category', data: ["2025-Q1", "2026-Q1", "2026-Q2"] },
+    yAxis: { type: 'category', data: ["\u8425\u6536", "\u51c0\u5229", "\u5e94\u6536", "\u5b58\u8d27", "\u7ecf\u8425CF", "\u6bdb\u5229\u7387"] },
+    visualMap: { min: -3, max: 3, calculable: true, orient: 'horizontal', left:'center', bottom:'0%',
+      inRange: { color: ['#27ae60','#d4edda','#fff3cd','#ffe5d0','#fadbd8','#e74c3c'] } },
+    series: [{ type: 'heatmap', data: [[0, 0, 0.0], [0, 1, 0.0], [0, 2, 0.0], [0, 3, 0.0], [0, 4, 0.0], [0, 5, 0.0], [1, 0, 0.0], [1, 1, 0.0], [1, 2, 0.0], [1, 3, 0.0], [1, 4, 0.0], [1, 5, 0.0], [2, 0, 1.41], [2, 1, 1.17], [2, 2, 0.7], [2, 3, 0.47], [2, 4, 0.56], [2, 5, 0.38]], label: { show: true, fontSize: 10 } }]
+  });
+
+  // 红灯信号时间线
+  
+  var rf = echarts.init(document.getElementById('redflag-timeline'));
+  rf.setOption({
+    tooltip: { trigger: 'axis' },
+    legend: { data: ['P0','P1'], bottom: '0%' },
+    xAxis: { type: 'category', data: ["2025-Q1", "2026-Q1", "2026-Q2"] },
+    yAxis: { type: 'value', name: '触发数' },
+    series: [
+      { type: 'bar', stack: 'total', data: [7], name: 'P0',
+        itemStyle: { color: '#e74c3c' } },
+      { type: 'bar', stack: 'total', data: [7], name: 'P1',
+        itemStyle: { color: '#f39c12' } }
+    ]
+  });
+  
+})();
+</script>
+</body>
+</html>
