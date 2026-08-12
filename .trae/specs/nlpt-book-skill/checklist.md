@@ -1,0 +1,12 @@
+- [x] Extraction script successfully processes the PDF and creates `full_text.txt` and `metadata.json`
+- [x] Book title, authors, and chapter structure are correctly identified from the extracted text
+- [x] All three chapters (3, 7, 11) have corresponding summary files in the `chapters/` directory
+- [x] Each chapter summary includes: Core Idea, Frameworks Introduced, Key Concepts, Mental Models, Anti-patterns, and Key Takeaways
+- [x] Technical chapters include preserved code examples with correct syntax and formatting
+- [x] `glossary.md` contains alphabetically sorted key terms with chapter references
+- [x] `patterns.md` contains concrete techniques with When/How/Trade-offs format
+- [x] `cheatsheet.md` contains decision rules, trade-off matrices, or thresholds (not just term definitions)
+- [x] `SKILL.md` includes: metadata header, usage instructions, core frameworks, chapter index, topic index, and supporting files reference
+- [x] `SKILL.md` body is under 4,000 tokens with most important content front-loaded
+- [x] All generated files are valid Markdown with proper formatting
+- [x] Skill directory structure is complete and discoverable by the agent system
